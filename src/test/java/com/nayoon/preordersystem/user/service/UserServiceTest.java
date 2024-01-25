@@ -3,6 +3,7 @@ package com.nayoon.preordersystem.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -106,7 +107,7 @@ class UserServiceTest {
 
       //then
       verify(mailService, times(1)).sendEmail(eq(email), anyString(), anyString());
-      verify(redisService, times(1)).setValues(anyString(), anyString(), any(), TimeUnit.MILLISECONDS);
+      verify(redisService, times(1)).setValues(anyString(), anyString(), anyLong(), eq(TimeUnit.MILLISECONDS));
     }
 
   }
