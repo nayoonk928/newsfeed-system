@@ -2,7 +2,6 @@ package com.nayoon.preordersystem.auth.service;
 
 import com.nayoon.preordersystem.auth.dto.TokenDto;
 import com.nayoon.preordersystem.auth.dto.request.SignInRequest;
-import com.nayoon.preordersystem.auth.security.JwtTokenProvider;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;

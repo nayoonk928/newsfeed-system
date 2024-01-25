@@ -1,6 +1,8 @@
-package com.nayoon.preordersystem.auth.security;
+package com.nayoon.preordersystem.auth.service;
 
 import com.nayoon.preordersystem.auth.dto.TokenDto;
+import com.nayoon.preordersystem.auth.security.CustomUserDetails;
+import com.nayoon.preordersystem.auth.security.CustomUserDetailsService;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.user.type.UserRole;
@@ -66,7 +68,7 @@ public class JwtTokenProvider {
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
 
-    return new TokenDto(accessToken, refreshToken, now.getTime() + refreshTokenValidationTime);
+    return new TokenDto(accessToken, refreshToken, refreshTokenValidationTime);
   }
 
   /**
