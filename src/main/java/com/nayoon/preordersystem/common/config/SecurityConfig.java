@@ -38,7 +38,8 @@ public class SecurityConfig {
                 antMatcher("/"),
                 antMatcher("/api/v1/users/signup"),
                 antMatcher("/api/v1/users/emails/**"),
-                antMatcher("/api/v1/users/emails/verifications/**")
+                antMatcher("/api/v1/users/emails/verifications/**"),
+                antMatcher("/api/v1/login")
             ).permitAll()
             .anyRequest().authenticated()
         )

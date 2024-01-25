@@ -43,7 +43,7 @@ public class UserService {
    * 회원가입 메서드
    */
   @Transactional
-  public void signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
+  public String signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
     // 비밀번호 암호화
     String encryptPassword = EncryptionUtils.encode(request.password());
 
@@ -68,7 +68,7 @@ public class UserService {
     user.updateProfileImage(s3ImageUrl);
 
     // 이메일로 인증 코드 전송
-    sendCode(request.email());
+    return sendCode(request.email());
   }
 
   /**
