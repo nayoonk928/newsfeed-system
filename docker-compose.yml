@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ./db/postgres/data:/var/lib/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: preorder_user
+      POSTGRES_DB: preorder_db
+    networks:
+      - preorder
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - preorder
+
+
+networks:
+  preorder:

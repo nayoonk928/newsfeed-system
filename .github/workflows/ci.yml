@@ -1,0 +1,59 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Set Yaml
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.APPLICATION }}" | base64 --decode > src/main/resources/application.yml
+        find src
+
+    - name: Set Test Yaml
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > src/main/resources/application-test.yml
+        find src
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build and Test with Gradle
+      run: ./gradlew build jacocoTestReport
+
+    - name: Publish test result
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+       files: '**/build/test-results/test/TEST-*.xml'
