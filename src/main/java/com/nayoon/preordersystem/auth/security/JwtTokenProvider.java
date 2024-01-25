@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,16 +25,20 @@ public class JwtTokenProvider {
 
   private final CustomUserDetailsService customUserDetailsService;
 
-  private static long accessTokenValidationTime ; // 액세스 토큰 만료시간
+  @Getter
+  private static long accessTokenValidationTime ; // accessToken 만료시간
+  private static long refreshTokenValidationTime ; // refreshToken 만료시간
   private static SecretKey key; // secretKey를 Key 객체로 해싱
 
   public JwtTokenProvider(
       CustomUserDetailsService customUserDetailsService, @Value("${spring.jwt.secret}") final String secretKey,
-      @Value("${spring.jwt.token-valid-time}") final long accessTokenValidationTime
+      @Value("${spring.jwt.access-token-valid-time}") final long accessTokenValidationTime,
+      @Value("${spring.jwt.refresh-token-valid-time}") final long refreshTokenValidationTime
   ) {
     this.customUserDetailsService = customUserDetailsService;
     this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     this.accessTokenValidationTime  = accessTokenValidationTime;
+    this.refreshTokenValidationTime  = refreshTokenValidationTime;
   }
 
   /**
@@ -53,7 +58,15 @@ public class JwtTokenProvider {
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
 
-    return new TokenDto(accessToken);
+    // refreshToken 생성
+    String refreshToken = Jwts.builder()
+        .setSubject(email)
+        .setIssuedAt(now)
+        .setExpiration(new Date(now.getTime() + refreshTokenValidationTime))
+        .signWith(key, SignatureAlgorithm.HS256)
+        .compact();
+
+    return new TokenDto(accessToken, refreshToken, now.getTime() + refreshTokenValidationTime);
   }
 
   /**
@@ -111,6 +124,15 @@ public class JwtTokenProvider {
     return Jwts.parserBuilder().setSigningKey(key).build()
         .parseClaimsJws(token)
         .getBody();
+  }
+
+  // accessToken 유효 시간 반환
+  public Long getAccessTokenExpiration(String accessToken) {
+    Claims claims = extractClaims(accessToken);
+    Date expiration = claims.getExpiration();
+    Date now = new Date();
+
+    return expiration.getTime() - now.getTime();
   }
 
 }

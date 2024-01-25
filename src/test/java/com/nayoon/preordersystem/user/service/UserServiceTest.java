@@ -22,6 +22,7 @@ import com.nayoon.preordersystem.user.repository.UserRepository;
 import com.nayoon.preordersystem.user.type.UserRole;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -105,7 +106,7 @@ class UserServiceTest {
 
       //then
       verify(mailService, times(1)).sendEmail(eq(email), anyString(), anyString());
-      verify(redisService, times(1)).setValues(anyString(), anyString(), any());
+      verify(redisService, times(1)).setValues(anyString(), anyString(), any(), TimeUnit.MILLISECONDS);
     }
 
   }

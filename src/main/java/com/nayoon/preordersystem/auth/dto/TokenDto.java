@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record TokenDto(
-    String accessToken
+    String accessToken,
+    String refreshToken,
+    Long refreshTokenExpiresTime
 ) {
 
 }

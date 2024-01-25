@@ -6,8 +6,10 @@ import com.nayoon.preordersystem.auth.security.JwtTokenProvider;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;
+import com.nayoon.preordersystem.redis.service.RedisService;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ public class LoginService {
   private final UserRepository userRepository;
   private final JwtTokenProvider jwtTokenProvider;
   private final EncryptionUtils encryptionUtils;
+  private final RedisService redisService;
 
   /**
    * 사용자 로그인 메서드
@@ -30,7 +33,13 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    return jwtTokenProvider.generateToken(user.getEmail(), user.getName(), user.getUserRole());
+    TokenDto tokenDto = jwtTokenProvider.generateToken(user.getEmail(), user.getName(),
+        user.getUserRole());
+
+    redisService.setValues("RT:" + user.getEmail(), tokenDto.refreshToken(),
+        tokenDto.refreshTokenExpiresTime(), TimeUnit.MILLISECONDS);
+
+    return tokenDto;
   }
 
 }

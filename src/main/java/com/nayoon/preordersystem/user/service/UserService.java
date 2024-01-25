@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -90,7 +91,7 @@ public class UserService {
     mailService.sendEmail(toEmail, title, authCode);
 
     // key = "AuthCode" + email, value = authCode 형식으로 Redis에 저장
-    redisService.setValues(AUTH_PREFIX + toEmail, authCode, Duration.ofMillis(authCodeExpirationMillis));
+    redisService.setValues(AUTH_PREFIX + toEmail, authCode, authCodeExpirationMillis, TimeUnit.MILLISECONDS);
     return authCode;
   }
 
