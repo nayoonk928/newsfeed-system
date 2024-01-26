@@ -22,6 +22,13 @@ public enum ErrorCode {
   // S3
   NO_FILE(HttpStatus.BAD_REQUEST, "설정할 파일이 없습니다."),
 
+  // Auth
+  INCORRECT_EMAIL_OR_PASSWORD(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 올바르지 않습니다."),
+  EMPTY_AUTHORIZATION_HEADER(HttpStatus.UNAUTHORIZED, "인증 헤더가 없습니다."),
+  INVALID_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
+  EXPIRED_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+  NOT_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
+
 
   // ------ 5xx ------
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 발생했습니다."),

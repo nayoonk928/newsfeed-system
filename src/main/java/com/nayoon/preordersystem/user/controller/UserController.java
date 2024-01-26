@@ -27,19 +27,18 @@ public class UserController {
    * 회원가입 컨트롤러
    */
   @PostMapping("/signup")
-  public ResponseEntity<Void> signup(
+  public ResponseEntity<String> signup(
       @Valid @RequestPart("data") SignUpRequest request,
       @RequestPart(name = "profileImage") MultipartFile imageFile
   ) throws IOException {
-    userService.signup(request, imageFile);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request, imageFile));
   }
 
   /**
    * 인증 메일 전송 컨트롤러
    */
   @PostMapping("/emails")
-  public ResponseEntity<Void> sendEmail(
+  public ResponseEntity<String> sendEmail(
       @Valid @RequestBody String email
   ) {
     userService.sendCode(email);
