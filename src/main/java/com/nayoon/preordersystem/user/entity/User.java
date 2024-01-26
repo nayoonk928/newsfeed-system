@@ -57,6 +57,16 @@ public class User extends BaseEntity {
     this.verified = verified;
   }
 
+  public void update(String name, String introduction, String profileImage) {
+    this.name = name;
+    this.introduction = introduction;
+    this.profileImage = profileImage;
+  }
+
+  public void updatePassword(String password) {
+    this.password = password;
+  }
+
   public void updateVerified(Boolean verified) {
     this.verified = verified;
   }

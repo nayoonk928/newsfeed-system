@@ -15,6 +15,8 @@ public enum ErrorCode {
   ALREADY_EXISTS_USER(HttpStatus.BAD_REQUEST,"이미 가입한 사용자입니다."),
   ALREADY_VERIFIED_USER(HttpStatus.BAD_REQUEST,"이미 인증이 완료된 사용자입니다."),
   AUTH_CODE_EXPIRED(HttpStatus.UNAUTHORIZED,"이메일 인증 코드가 만료되었습니다."),
+  PASSWORD_NOT_CHANGED(HttpStatus.BAD_REQUEST,"이전 비밀번호와 동일합니다."),
+  NOT_MATCHED_CURR_PASSWORD(HttpStatus.BAD_REQUEST,"현재 비밀번호가 올바르지 않습니다."),
 
   // Email
   UNABLE_TO_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다"),
