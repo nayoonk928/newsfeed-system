@@ -1,14 +1,20 @@
 package com.nayoon.preordersystem.user.controller;
 
+import com.nayoon.preordersystem.auth.security.CustomUserDetails;
+import com.nayoon.preordersystem.user.dto.request.PasswordUpdateRequest;
+import com.nayoon.preordersystem.user.dto.request.ProfileUpdateRequest;
 import com.nayoon.preordersystem.user.dto.request.SignUpRequest;
 import com.nayoon.preordersystem.user.dto.request.VerifyEmailRequest;
+import com.nayoon.preordersystem.user.dto.response.UserResponse;
 import com.nayoon.preordersystem.user.service.UserService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +38,30 @@ public class UserController {
       @RequestPart(name = "profileImage") MultipartFile imageFile
   ) throws IOException {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request, imageFile));
+  }
+
+  /**
+   * 이름, 프로필 이미지, 인사말 업데이트 컨트롤러
+   */
+  @PatchMapping("/profile")
+  public ResponseEntity<UserResponse> updateProfile(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestPart("data") ProfileUpdateRequest request,
+      @RequestPart(name = "profileImage", required = false) MultipartFile imageFile
+  ) throws IOException {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.updateProfile(userDetails, request, imageFile));
+  }
+
+  /**
+   * 비밀번호 업데이트 컨트롤러
+   */
+  @PatchMapping("/password")
+  public ResponseEntity<Void> updatePassword(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody PasswordUpdateRequest request
+  ) {
+    userService.updatePassword(userDetails, request);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   /**

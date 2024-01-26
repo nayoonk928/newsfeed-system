@@ -5,7 +5,7 @@ import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +31,7 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    TokenDto tokenDto = jwtTokenProvider.generateToken(user.getEmail(), user.getName(),
-        user.getUserRole());
+    TokenDto tokenDto = jwtTokenProvider.generateToken(user.getEmail(), user.getUserRole());
 
     redisService.setValues("RT:" + user.getEmail(), tokenDto.refreshToken(),
         tokenDto.refreshTokenExpiresTime(), TimeUnit.MILLISECONDS);

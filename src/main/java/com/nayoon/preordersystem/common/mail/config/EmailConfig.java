@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.mail.config;
+package com.nayoon.preordersystem.common.mail.config;
 
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;

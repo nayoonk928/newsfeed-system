@@ -1,19 +1,23 @@
 package com.nayoon.preordersystem.user.service;
 
+import com.nayoon.preordersystem.auth.security.CustomUserDetails;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;
-import com.nayoon.preordersystem.mail.service.MailService;
-import com.nayoon.preordersystem.redis.service.RedisService;
-import com.nayoon.preordersystem.s3.service.S3Service;
+import com.nayoon.preordersystem.common.mail.service.MailService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
+import com.nayoon.preordersystem.common.s3.service.S3Service;
+import com.nayoon.preordersystem.user.dto.request.PasswordUpdateRequest;
+import com.nayoon.preordersystem.user.dto.request.ProfileUpdateRequest;
 import com.nayoon.preordersystem.user.dto.request.SignUpRequest;
 import com.nayoon.preordersystem.user.dto.request.VerifyEmailRequest;
+import com.nayoon.preordersystem.user.dto.response.UserResponse;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.Duration;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -72,9 +76,7 @@ public class UserService {
     return sendCode(request.email());
   }
 
-  /**
-   * 이메일 중복 체크하는 메서드
-   */
+  // 이메일 중복 체크 메서드
   private void checkDuplicatedEmail(String email) {
     if (userRepository.existsByEmail(email)) {
       log.debug("UserService.checkDuplicatedEmail exception occur email: {}", email);
@@ -95,9 +97,7 @@ public class UserService {
     return authCode;
   }
 
-  /**
-   * 이메일 인증 코드 생성 메서드
-   */
+  // 이메일 인증 코드 생성 메서드
   private String createCode() {
     int length = 6;
     try {
@@ -137,6 +137,63 @@ public class UserService {
     }
 
     return false;
+  }
+
+  /**
+   * 사용자 정보 업데이트 (이름, 프로필 이미지, 인사말)
+   */
+  @Transactional
+  public UserResponse updateProfile(CustomUserDetails userDetails, ProfileUpdateRequest request,
+      MultipartFile imageFile) throws IOException {
+    User user = userRepository.findById(userDetails.getId())
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+    String imageUrl = getImageUrl(user, user.getProfileImage(), imageFile);
+
+    user.update(request.name(), request.introduction(), imageUrl);
+
+    return UserResponse.builder()
+        .email(user.getEmail())
+        .name(user.getName())
+        .profileImage(user.getProfileImage())
+        .introduction(user.getIntroduction())
+        .build();
+  }
+
+  // 프로필 이미지 url 반환 (입력된 파일이 있다면 새 url 반환, 아니라면 기존 url 반환)
+  private String getImageUrl(User user, String prevImage, MultipartFile imageFile)
+      throws IOException {
+    if (imageFile != null && !imageFile.isEmpty()) {
+      // S3에 있는 기존 이미지 삭제 (세번째 "/" 이후의 문자열 전달)
+      s3Service.deleteFile(String.join("/", Arrays.copyOfRange(prevImage.split("/"),
+          3, prevImage.split("/").length)));
+
+      return s3Service.saveFile(imageFile, user, IMAGE_PATH);
+    }
+    return prevImage;
+  }
+
+  /**
+   * 비밀번호 업데이트
+   */
+  @Transactional
+  public void updatePassword(CustomUserDetails userDetails, PasswordUpdateRequest request) {
+    User user = userRepository.findById(userDetails.getId())
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+    String encryptedPassword = EncryptionUtils.encode(request.newPassword());
+
+    // 현재 비밀번호 올바르게 입력했는지 확인
+    if (!EncryptionUtils.matchPassword(request.prevPassword(), user.getPassword())) {
+      throw new CustomException(ErrorCode.NOT_MATCHED_CURR_PASSWORD);
+    }
+
+    // 현재 비밀번호와 새로운 비밀번호가 동일한지 확인
+    if (EncryptionUtils.matchPassword(request.prevPassword(), encryptedPassword)) {
+      throw new CustomException(ErrorCode.PASSWORD_NOT_CHANGED);
+    }
+
+    user.updatePassword(encryptedPassword);
   }
 
 }

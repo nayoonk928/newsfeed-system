@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import com.nayoon.preordersystem.auth.dto.request.LogoutRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

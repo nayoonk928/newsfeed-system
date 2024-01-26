@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.redis.service;
+package com.nayoon.preordersystem.common.redis.service;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;

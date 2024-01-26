@@ -1,7 +1,7 @@
 package com.nayoon.preordersystem.auth.filter;
 
 import com.nayoon.preordersystem.auth.service.JwtTokenProvider;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

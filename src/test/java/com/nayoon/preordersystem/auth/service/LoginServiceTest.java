@@ -14,7 +14,7 @@ import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import com.nayoon.preordersystem.user.type.UserRole;
@@ -74,8 +74,7 @@ class LoginServiceTest {
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
       when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-      when(jwtTokenProvider.generateToken(user.getEmail(), user.getName(),
-          user.getUserRole())).thenReturn(tokenDto);
+      when(jwtTokenProvider.generateToken(user.getEmail(), user.getUserRole())).thenReturn(tokenDto);
 
       //when
       TokenDto result = loginService.login(request);

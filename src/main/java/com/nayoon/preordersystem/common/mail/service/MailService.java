@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.mail.service;
+package com.nayoon.preordersystem.common.mail.service;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;

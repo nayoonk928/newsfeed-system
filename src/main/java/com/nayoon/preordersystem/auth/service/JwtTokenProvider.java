@@ -5,6 +5,7 @@ import com.nayoon.preordersystem.auth.security.CustomUserDetails;
 import com.nayoon.preordersystem.auth.security.CustomUserDetailsService;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import com.nayoon.preordersystem.user.type.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
   private final CustomUserDetailsService customUserDetailsService;
+  private final RedisService redisService;
 
   @Getter
   private static long accessTokenValidationTime ; // accessToken 만료시간
@@ -33,11 +35,14 @@ public class JwtTokenProvider {
   private static SecretKey key; // secretKey를 Key 객체로 해싱
 
   public JwtTokenProvider(
-      CustomUserDetailsService customUserDetailsService, @Value("${spring.jwt.secret}") final String secretKey,
+      CustomUserDetailsService customUserDetailsService,
+      RedisService redisService,
+      @Value("${spring.jwt.secret}") final String secretKey,
       @Value("${spring.jwt.access-token-valid-time}") final long accessTokenValidationTime,
       @Value("${spring.jwt.refresh-token-valid-time}") final long refreshTokenValidationTime
   ) {
     this.customUserDetailsService = customUserDetailsService;
+    this.redisService = redisService;
     this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     this.accessTokenValidationTime  = accessTokenValidationTime;
     this.refreshTokenValidationTime  = refreshTokenValidationTime;
@@ -46,13 +51,12 @@ public class JwtTokenProvider {
   /**
    * 토큰 생성 메서드
    */
-  public TokenDto generateToken(String email, String name, UserRole role) {
+  public TokenDto generateToken(String email, UserRole role) {
     Date now = new Date();
 
     // accessToken 생성
     String accessToken = Jwts.builder()
         .setSubject(email)
-        .claim("name", name)
         .claim("email", email)
         .claim("role", role.getName())
         .setIssuedAt(now)
@@ -119,9 +123,7 @@ public class JwtTokenProvider {
     }
   }
 
-  /**
-   * 토큰에러 Claims 추출하는 메서드
-   */
+  // 토큰에서 Claims 추출하는 메서드
   private Claims extractClaims(String token) {
     return Jwts.parserBuilder().setSigningKey(key).build()
         .parseClaimsJws(token)

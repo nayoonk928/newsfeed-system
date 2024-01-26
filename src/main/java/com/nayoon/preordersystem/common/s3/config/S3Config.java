@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.s3.config;
+package com.nayoon.preordersystem.common.s3.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
