@@ -74,8 +74,7 @@ class LoginServiceTest {
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
       when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-      when(jwtTokenProvider.generateToken(user.getEmail(), user.getName(),
-          user.getUserRole())).thenReturn(tokenDto);
+      when(jwtTokenProvider.generateToken(user.getEmail(), user.getUserRole())).thenReturn(tokenDto);
 
       //when
       TokenDto result = loginService.login(request);
