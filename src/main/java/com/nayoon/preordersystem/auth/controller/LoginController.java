@@ -1,7 +1,7 @@
 package com.nayoon.preordersystem.auth.controller;
 
 import com.nayoon.preordersystem.auth.dto.TokenDto;
-import com.nayoon.preordersystem.auth.dto.request.SignInRequest;
+import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.auth.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class LoginController {
    */
   @PostMapping("/login")
   public ResponseEntity<TokenDto> login(
-      @Valid @RequestBody SignInRequest request
+      @Valid @RequestBody LoginRequest request
   ) {
     return ResponseEntity.ok().body(loginService.login(request));
   }
