@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.redis.config;
+package com.nayoon.preordersystem.common.redis.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

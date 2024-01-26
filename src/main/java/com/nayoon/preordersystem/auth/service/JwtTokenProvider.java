@@ -5,7 +5,7 @@ import com.nayoon.preordersystem.auth.security.CustomUserDetails;
 import com.nayoon.preordersystem.auth.security.CustomUserDetailsService;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import com.nayoon.preordersystem.user.type.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

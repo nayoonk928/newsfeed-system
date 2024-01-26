@@ -1,4 +1,4 @@
-package com.nayoon.preordersystem.s3.service;
+package com.nayoon.preordersystem.common.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;

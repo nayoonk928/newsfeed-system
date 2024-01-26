@@ -14,7 +14,7 @@ import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.utils.EncryptionUtils;
-import com.nayoon.preordersystem.redis.service.RedisService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import com.nayoon.preordersystem.user.type.UserRole;

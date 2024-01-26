@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.mail.service.MailService;
-import com.nayoon.preordersystem.redis.service.RedisService;
-import com.nayoon.preordersystem.s3.service.S3Service;
+import com.nayoon.preordersystem.common.mail.service.MailService;
+import com.nayoon.preordersystem.common.redis.service.RedisService;
+import com.nayoon.preordersystem.common.s3.service.S3Service;
 import com.nayoon.preordersystem.user.dto.request.SignUpRequest;
 import com.nayoon.preordersystem.user.dto.request.VerifyEmailRequest;
 import com.nayoon.preordersystem.user.entity.User;
