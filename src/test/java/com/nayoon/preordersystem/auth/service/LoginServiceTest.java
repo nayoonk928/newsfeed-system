@@ -134,7 +134,7 @@ class LoginServiceTest {
         .email("test@example.com")
         .name("Test User")
         .password("password")
-        .introduction("Hello, I'm a test user.")
+        .greeting("Hello, I'm a test user.")
         .userRole(UserRole.USER)
         .verified(verified)
         .build();
