@@ -33,8 +33,8 @@ public class User extends BaseEntity {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "introduction", nullable = false)
-  private String introduction;
+  @Column(name = "greeting", nullable = false)
+  private String greeting;
 
   @Column(name = "profile_image")
   private String profileImage;
@@ -46,20 +46,20 @@ public class User extends BaseEntity {
   private Boolean verified;
 
   @Builder
-  public User(String email, String password, String name, String introduction, String profileImage,
+  public User(String email, String password, String name, String greeting, String profileImage,
       UserRole userRole, Boolean verified) {
     this.email = email;
     this.password = password;
     this.name = name;
-    this.introduction = introduction;
+    this.greeting = greeting;
     this.profileImage = profileImage;
     this.userRole = userRole;
     this.verified = verified;
   }
 
-  public void update(String name, String introduction, String profileImage) {
+  public void update(String name, String greeting, String profileImage) {
     this.name = name;
-    this.introduction = introduction;
+    this.greeting = greeting;
     this.profileImage = profileImage;
   }
 

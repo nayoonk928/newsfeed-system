@@ -31,6 +31,10 @@ public enum ErrorCode {
   EXPIRED_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
   NOT_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
 
+  // FOLLOW
+  ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "이미 팔로우 중입니다."),
+  CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "팔로우 대상으로 자기 자신을 선택할 수 없습니다."),
+
 
   // ------ 5xx ------
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 발생했습니다."),

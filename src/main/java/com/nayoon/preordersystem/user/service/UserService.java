@@ -59,13 +59,14 @@ public class UserService {
         .email(request.email())
         .name(request.name())
         .password(encryptPassword)
-        .introduction(request.introduction())
+        .greeting(request.greeting())
         .userRole(request.userRole())
         .verified(false)  // 아직 이메일 인증을 받지 않았기 때문에 verified = true
         .build();
 
     userRepository.save(user);
 
+    // TODO: userRepository에 이미 User가 저장이 되었는데 S3 업로드에서 에러가 발생하면 DB가 어떻게 되는지 확인하기
     // S3에 업로드
     String s3ImageUrl = s3Service.saveFile(imageFile, user, IMAGE_PATH);
 
@@ -150,13 +151,13 @@ public class UserService {
 
     String imageUrl = getImageUrl(user, user.getProfileImage(), imageFile);
 
-    user.update(request.name(), request.introduction(), imageUrl);
+    user.update(request.name(), request.greeting(), imageUrl);
 
     return UserResponse.builder()
         .email(user.getEmail())
         .name(user.getName())
         .profileImage(user.getProfileImage())
-        .introduction(user.getIntroduction())
+        .greeting(user.getGreeting())
         .build();
   }
 

@@ -7,7 +7,7 @@ public record UserResponse(
     String email,
     String name,
     String profileImage,
-    String introduction
+    String greeting
 ) {
 
 }

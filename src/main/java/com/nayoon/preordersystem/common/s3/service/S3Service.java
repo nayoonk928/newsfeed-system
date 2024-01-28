@@ -23,6 +23,7 @@ public class S3Service {
   @Value("${aws.s3.bucket}")
   private String bucket;
 
+  // TODO: 연결 유실이 발생할 경우 다시 업로드 하도록 로직 수정 필요
   /**
    * S3 파일 업로드 메서드
    */

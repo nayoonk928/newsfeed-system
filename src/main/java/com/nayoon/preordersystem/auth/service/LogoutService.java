@@ -35,7 +35,7 @@ public class LogoutService {
 
     // 해당 accessToken 유효시간을 블랙리스트에 저장
     Long expiration = jwtTokenProvider.getAccessTokenExpiration(accessToken);
-    redisService.setValues(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+    redisService.setValues(accessToken, null, expiration, TimeUnit.MILLISECONDS);
   }
 
 }

@@ -22,7 +22,7 @@ public record SignUpRequest(
     String name,
 
     @NotBlank(message = "인사말을 등록해주세요.")
-    String introduction,
+    String greeting,
 
     @NotNull(message = "사용자 유형을 선택해주세요.")
     UserRole userRole
