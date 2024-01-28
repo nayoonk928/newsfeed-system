@@ -13,10 +13,13 @@ import static org.mockito.Mockito.when;
 
 import com.nayoon.preordersystem.comment.dto.request.CommentCreateRequest;
 import com.nayoon.preordersystem.comment.entity.Comment;
+import com.nayoon.preordersystem.comment.entity.CommentLike;
+import com.nayoon.preordersystem.comment.repository.CommentLikeRepository;
 import com.nayoon.preordersystem.comment.repository.CommentRepository;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.post.entity.Post;
+import com.nayoon.preordersystem.post.entity.PostLike;
 import com.nayoon.preordersystem.post.repository.PostRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +41,9 @@ class CommentServiceTest {
 
   @Mock
   private CommentRepository commentRepository;
+
+  @Mock
+  private CommentLikeRepository commentLikeRepository;
 
   @Nested
   @DisplayName("댓글 생성")
@@ -87,6 +93,64 @@ class CommentServiceTest {
       assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
       verify(postRepository, times(1)).findById(userId);
       verify(commentRepository, never()).save(any(Comment.class));
+    }
+
+  }
+
+  @Nested
+  @DisplayName("댓글 좋아요")
+  class likeComment {
+
+    @Test
+    @DisplayName("성공")
+    void success() {
+      //given
+      Long userId = 1L;
+      Comment comment = mock(Comment.class);
+
+      when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+      when(commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), userId)).thenReturn(false);
+
+      //when
+      commentService.likeComment(userId, comment.getId());
+
+      //then
+      verify(commentLikeRepository, times(1)).save(any(CommentLike.class));
+    }
+
+    @Test
+    @DisplayName("실패: 댓글 찾을 수 없음")
+    void postNotFound() {
+      //given
+      Long userId = 1L;
+      Comment comment = mock(Comment.class);
+
+      when(commentRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+      //when
+      CustomException exception = assertThrows(CustomException.class, ()
+          -> commentService.likeComment(userId, comment.getId()));
+
+      //then
+      assertEquals(ErrorCode.COMMENT_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("실패: 이미 좋아요한 댓글")
+    void alreadyLikedPost() {
+      //given
+      Long userId = 1L;
+      Comment comment = mock(Comment.class);
+
+      when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+      when(commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), userId)).thenReturn(true);
+
+      //when
+      CustomException exception = assertThrows(CustomException.class, ()
+          -> commentService.likeComment(userId, comment.getId()));
+
+      //then
+      assertEquals(ErrorCode.ALREADY_LIKED_COMMENT, exception.getErrorCode());
     }
 
   }
