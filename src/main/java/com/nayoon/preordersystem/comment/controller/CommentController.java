@@ -8,6 +8,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,18 @@ public class CommentController {
   ) {
     Long commentId = commentService.createComment(userDetails.getId(), request);
     return ResponseEntity.created(URI.create("api/v1/comments/" + commentId)).build();
+  }
+
+  /**
+   * 댓글 좋아요 기능
+   */
+  @PostMapping("/{id}/like")
+  public ResponseEntity<Void> likeComment(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable("id") Long commentId
+  ) {
+    commentService.likeComment(userDetails.getId(), commentId);
+    return ResponseEntity.ok().build();
   }
 
 }

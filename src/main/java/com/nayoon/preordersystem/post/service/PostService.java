@@ -36,7 +36,6 @@ public class PostService {
   /**
    * 게시글 좋아요 메서드
    */
-  // TODO: 동시성 처리
   @Transactional
   public void likePost(Long userId, Long postId) {
 
@@ -44,7 +43,7 @@ public class PostService {
         .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     if (postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
-      throw new CustomException(ErrorCode.ALREADY_LIKED);
+      throw new CustomException(ErrorCode.ALREADY_LIKED_POST);
     }
 
     PostLike postLike = PostLike.builder()
