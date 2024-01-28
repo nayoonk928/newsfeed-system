@@ -28,8 +28,8 @@ public class CustomUserDetails implements UserDetails {
     return user.getName();
   }
 
-  public String getIntroduction() {
-    return user.getIntroduction();
+  public String getGreeting() {
+    return user.getGreeting();
   }
 
   public String getProfileImage() {

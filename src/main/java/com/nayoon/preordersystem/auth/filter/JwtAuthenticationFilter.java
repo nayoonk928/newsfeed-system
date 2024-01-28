@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,13 +28,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String token = jwtTokenProvider.extractTokenFromRequest(request);
 
     if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-      String isLogout = (String) redisService.getValue(token);
+      boolean isLogout = redisService.keyExists(token);
 
-      if (ObjectUtils.isEmpty(isLogout)) {
+      if (!isLogout) {
         // 토큰이 유효한 경유 유저 정보 받기
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
         // 인증 성공한 경우, SecurityContextHolder 에 인증 객체 설정
         SecurityContextHolder.getContext().setAuthentication(authentication);
+      } else {
+        // TODO: 로그아웃 했다면 다시 로그인 하도록 예외 처리
       }
     }
 

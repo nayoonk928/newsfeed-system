@@ -6,7 +6,7 @@ public record ProfileUpdateRequest(
     @NotBlank
     String name,
     @NotBlank
-    String introduction
+    String greeting
 ) {
 
 }

@@ -58,7 +58,7 @@ class LogoutServiceTest {
       //then
       verify(jwtTokenProvider, times(1)).validateToken(request.accessToken());
       verify(jwtTokenProvider, times(1)).getAuthentication(request.accessToken());
-      verify(redisService, times(1)).setValues(eq(request.accessToken()), eq("logout"),
+      verify(redisService, times(1)).setValues(eq(request.accessToken()), eq(null),
           anyLong(), eq(TimeUnit.MILLISECONDS));
     }
 

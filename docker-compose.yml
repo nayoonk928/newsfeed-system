@@ -3,6 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres
+    container_name: postgres
     volumes:
       - ./db/postgres/data:/var/lib/postgres
     ports:
@@ -16,6 +17,7 @@ services:
 
   redis:
     image: redis
+    container_name: redis
     ports:
       - "6379:6379"
     networks:

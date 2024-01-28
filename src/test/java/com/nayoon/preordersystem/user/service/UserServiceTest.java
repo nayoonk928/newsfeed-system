@@ -229,7 +229,7 @@ class UserServiceTest {
 
       assertEquals("test@example.com", result.email());
       assertEquals(updateRequest.name(), result.name());
-      assertEquals(updateRequest.introduction(), result.introduction());
+      assertEquals(updateRequest.greeting(), result.greeting());
     }
 
     @Test
@@ -303,7 +303,7 @@ class UserServiceTest {
         .email("test@example.com")
         .name("Test User")
         .password("password")
-        .introduction("Hello, I'm a test user.")
+        .greeting("Hello, I'm a test user.")
         .userRole(UserRole.USER)
         .build();
   }
@@ -320,7 +320,7 @@ class UserServiceTest {
         .email("test@example.com")
         .name("Test User")
         .password("encoded_password")
-        .introduction("Hello, I'm a test user.")
+        .greeting("Hello, I'm a test user.")
         .profileImage("s3///image/jpeg")
         .userRole(UserRole.USER)
         .verified(verified)
