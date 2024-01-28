@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,9 +14,9 @@ import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.post.dto.request.PostCreateRequest;
 import com.nayoon.preordersystem.post.entity.Post;
+import com.nayoon.preordersystem.post.entity.PostLike;
+import com.nayoon.preordersystem.post.repository.PostLikeRepository;
 import com.nayoon.preordersystem.post.repository.PostRepository;
-import com.nayoon.preordersystem.user.entity.User;
-import com.nayoon.preordersystem.user.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,10 +36,10 @@ class PostServiceTest {
   private PostRepository postRepository;
 
   @Mock
-  private UserRepository userRepository;
+  private PostLikeRepository postLikeRepository;
 
   @Nested
-  @DisplayName("포스트 생성")
+  @DisplayName("게시글 생성")
   class createPost {
 
     @Test
@@ -49,9 +49,6 @@ class PostServiceTest {
       Long userId = 1L;
       PostCreateRequest request = new PostCreateRequest("title", "content");
 
-      User user = mock(User.class);
-
-      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
       when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
         return Post.builder().id(123L).title(request.title()).content(request.content()).build();
       });
@@ -62,27 +59,65 @@ class PostServiceTest {
       //then
       assertNotNull(postId);
       assertEquals(123L, postId);  // ID가 Mocked로 설정되었는지 확인
-      verify(userRepository, times(1)).findById(userId);
       verify(postRepository, times(1)).save(any(Post.class));
     }
 
+  }
+
+  @Nested
+  @DisplayName("게시글 좋아요")
+  class likePost {
+
     @Test
-    @DisplayName("실패: 사용자 찾을 수 없음")
-    void userNotFound() {
+    @DisplayName("성공")
+    void success() {
       //given
       Long userId = 1L;
-      PostCreateRequest request = new PostCreateRequest("title", "content");
+      Post post = mock(Post.class);
 
-      when(userRepository.findById(userId)).thenReturn(Optional.empty());
+      when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+      when(postLikeRepository.existsByPostIdAndUserId(post.getId(), userId)).thenReturn(false);
 
       //when
-      CustomException exception = assertThrows(CustomException.class,
-          () -> postService.createPost(userId, request));
+      postService.likePost(userId, post.getId());
 
       //then
-      assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-      verify(userRepository, times(1)).findById(userId);
-      verify(postRepository, never()).save(any(Post.class));
+      verify(postLikeRepository, times(1)).save(any(PostLike.class));
+    }
+
+    @Test
+    @DisplayName("실패: 게시글 찾을 수 없음")
+    void postNotFound() {
+      //given
+      Long userId = 1L;
+      Post post = mock(Post.class);
+
+      when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+      //when
+      CustomException exception = assertThrows(CustomException.class, ()
+          -> postService.likePost(userId, post.getId()));
+
+      //then
+      assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("실패: 이미 좋아요한 게시글")
+    void alreadyLikedPost() {
+      //given
+      Long userId = 1L;
+      Post post = mock(Post.class);
+
+      when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+      when(postLikeRepository.existsByPostIdAndUserId(post.getId(), userId)).thenReturn(true);
+
+      //when
+      CustomException exception = assertThrows(CustomException.class, ()
+          -> postService.likePost(userId, post.getId()));
+
+      //then
+      assertEquals(ErrorCode.ALREADY_LIKED_POST, exception.getErrorCode());
     }
 
   }
