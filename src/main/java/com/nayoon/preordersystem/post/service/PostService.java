@@ -21,6 +21,7 @@ public class PostService {
   /**
    *  게시글 생성 메서드
    */
+  // TODO: Post에 UserId 바로 저장하도록 변경
   @Transactional
   public Long createPost(Long userId, PostCreateRequest request) {
     User user = userRepository.findById(userId)
