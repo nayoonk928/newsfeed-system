@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -48,7 +49,7 @@ class LogoutServiceTest {
       LogoutRequest request = createLogoutRequest();
       when(jwtTokenProvider.validateToken(request.accessToken())).thenReturn(true);
 
-      Authentication authentication = mock(Authentication.class);
+      AbstractAuthenticationToken authentication = mock(AbstractAuthenticationToken.class);
       when(authentication.getName()).thenReturn("authenticatedUserEmail");
       when(jwtTokenProvider.getAuthentication(request.accessToken())).thenReturn(authentication);
 
