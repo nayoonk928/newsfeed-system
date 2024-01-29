@@ -6,7 +6,7 @@ import com.nayoon.preordersystem.common.redis.service.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ public class LogoutService {
       throw new CustomException(ErrorCode.INVALID_AUTHENTICATION_TOKEN);
     }
 
-    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+    AbstractAuthenticationToken authentication = jwtTokenProvider.getAuthentication(accessToken);
 
     // Redis에 현재 사용자의 이메일로 저장된 refreshToken이 있으면 삭제
     String redisKey = "RT:" + authentication.getName();

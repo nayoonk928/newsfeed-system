@@ -2,7 +2,6 @@ package com.nayoon.preordersystem.auth.controller;
 
 import com.nayoon.preordersystem.auth.service.LogoutService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,7 @@ public class LogoutController {
    */
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(
-      HttpServletRequest request,
-      HttpServletResponse response
+      HttpServletRequest request
   ) {
     logoutService.logout(request);
     return ResponseEntity.status(HttpStatus.OK).build();
