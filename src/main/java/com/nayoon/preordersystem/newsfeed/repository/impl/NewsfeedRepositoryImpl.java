@@ -21,6 +21,7 @@ public class NewsfeedRepositoryImpl implements NewsfeedQRepository {
 
   private final JPAQueryFactory queryFactory;
 
+  // TODO: No-offset 방식과 비교해보기
   // 팔로우하고 있는 사람들의 활동 반환
   @Override
   public Page<Newsfeed> filterNewsfeeds(Long userId, List<Long> followingIds, Pageable pageable) {

@@ -46,8 +46,9 @@ public class User extends BaseEntity {
   private Boolean verified;
 
   @Builder
-  public User(String email, String password, String name, String greeting, String profileImage,
+  public User(Long id, String email, String password, String name, String greeting, String profileImage,
       UserRole userRole, Boolean verified) {
+    this.id = id;
     this.email = email;
     this.password = password;
     this.name = name;

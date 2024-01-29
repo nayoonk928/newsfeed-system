@@ -6,6 +6,7 @@ import com.nayoon.preordersystem.auth.security.CustomUserDetailsService;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.redis.service.RedisService;
+import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.type.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,14 +52,17 @@ public class JwtTokenProvider {
   /**
    * 토큰 생성 메서드
    */
-  public TokenDto generateToken(String email, UserRole role) {
+  public TokenDto generateToken(User user, UserRole role) {
     Date now = new Date();
+    String email = user.getEmail();
+    boolean verified = user.getVerified();
 
     // accessToken 생성
     String accessToken = Jwts.builder()
         .setSubject(email)
         .claim("email", email)
         .claim("role", role.getName())
+        .claim("verified", verified)
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + accessTokenValidationTime))
         .signWith(key, SignatureAlgorithm.HS256)

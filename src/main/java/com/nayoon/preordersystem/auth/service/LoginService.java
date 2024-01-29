@@ -31,7 +31,7 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    TokenDto tokenDto = jwtTokenProvider.generateToken(user.getEmail(), user.getUserRole());
+    TokenDto tokenDto = jwtTokenProvider.generateToken(user, user.getUserRole());
 
     redisService.setValues("RT:" + user.getEmail(), tokenDto.refreshToken(),
         tokenDto.refreshTokenExpiresTime(), TimeUnit.MILLISECONDS);
