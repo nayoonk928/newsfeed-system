@@ -3,17 +3,15 @@ package com.nayoon.preordersystem.common.redis.service;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RedisService {
 
   private final RedisTemplate<String, Object> redisTemplate;
-
-  public RedisService(RedisTemplate<String, Object> redisTemplate) {
-    this.redisTemplate = redisTemplate;
-  }
 
   public void setValues(String key, Object value, Long expiration, TimeUnit timeUnit) {
     redisTemplate.opsForValue().set(key, value, expiration, timeUnit);

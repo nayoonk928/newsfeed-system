@@ -6,24 +6,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
+import com.nayoon.preordersystem.common.utils.EncryptionUtils;
+import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
+import com.nayoon.preordersystem.newsfeed.repository.NewsfeedRepository;
+import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
 import com.nayoon.preordersystem.post.dto.request.PostCreateRequest;
 import com.nayoon.preordersystem.post.entity.Post;
 import com.nayoon.preordersystem.post.entity.PostLike;
 import com.nayoon.preordersystem.post.repository.PostLikeRepository;
 import com.nayoon.preordersystem.post.repository.PostRepository;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +45,24 @@ class PostServiceTest {
 
   @Mock
   private PostLikeRepository postLikeRepository;
+
+  @Mock
+  private NewsfeedService newsfeedService;
+
+  @Mock
+  private NewsfeedRepository newsfeedRepository;
+
+  private static MockedStatic<NewsfeedCreateRequest> mNewsfeedCreateRequest;
+
+  @BeforeAll
+  static void beforeClass() {
+    mNewsfeedCreateRequest = mockStatic(NewsfeedCreateRequest.class);
+  }
+
+  @AfterAll
+  static void afterClass() {
+    mNewsfeedCreateRequest.close();
+  }
 
   @Nested
   @DisplayName("게시글 생성")

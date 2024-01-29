@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,7 +79,7 @@ public class UserController {
   /**
    * 인증 코드 확인 컨트롤러
    */
-  @GetMapping("/emails/verifications")
+  @PostMapping("/emails/verifications")
   public ResponseEntity<Void> verifyEmail(
       @Valid @RequestBody VerifyEmailRequest request
   ) {
