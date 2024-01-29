@@ -1,9 +1,9 @@
 package com.nayoon.preordersystem.auth.service;
 
-import com.nayoon.preordersystem.auth.dto.request.LogoutRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.common.redis.service.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -18,8 +18,8 @@ public class LogoutService {
   private final RedisService redisService;
 
   @Transactional
-  public void logout(LogoutRequest request) {
-    String accessToken = request.accessToken();
+  public void logout(HttpServletRequest request) {
+    String accessToken = jwtTokenProvider.resolveAccessToken(request);
 
     if (!jwtTokenProvider.validateToken(accessToken)) {
       throw new CustomException(ErrorCode.INVALID_AUTHENTICATION_TOKEN);

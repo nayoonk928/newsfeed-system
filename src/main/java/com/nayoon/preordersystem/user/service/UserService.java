@@ -66,7 +66,6 @@ public class UserService {
 
     userRepository.save(user);
 
-    // TODO: userRepository에 이미 User가 저장이 되었는데 S3 업로드에서 에러가 발생하면 DB가 어떻게 되는지 확인하기
     // S3에 업로드
     String s3ImageUrl = s3Service.saveFile(imageFile, user, IMAGE_PATH);
 
