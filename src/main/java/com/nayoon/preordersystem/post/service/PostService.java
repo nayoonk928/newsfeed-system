@@ -2,6 +2,9 @@ package com.nayoon.preordersystem.post.service;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
+import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
+import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
+import com.nayoon.preordersystem.newsfeed.type.ActivityType;
 import com.nayoon.preordersystem.post.dto.request.PostCreateRequest;
 import com.nayoon.preordersystem.post.entity.Post;
 import com.nayoon.preordersystem.post.entity.PostLike;
@@ -17,6 +20,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
+  private final NewsfeedService newsfeedService;
 
   /**
    *  게시글 생성 메서드
@@ -29,7 +33,14 @@ public class PostService {
         .content(request.content())
         .build();
 
-    return postRepository.save(post).getId();
+    Post saved = postRepository.save(post);
+
+    NewsfeedCreateRequest newsfeedCreateRequest =
+        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST);
+
+    newsfeedService.create(newsfeedCreateRequest);
+
+    return saved.getId();
   }
 
   /**
@@ -50,7 +61,12 @@ public class PostService {
         .userId(userId)
         .build();
 
-    postLikeRepository.save(postLike);
+    PostLike saved = postLikeRepository.save(postLike);
+
+    NewsfeedCreateRequest newsfeedCreateRequest =
+        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST_LIKE);
+
+    newsfeedService.create(newsfeedCreateRequest);
   }
 
 }

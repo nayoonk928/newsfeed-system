@@ -6,6 +6,8 @@ import com.nayoon.preordersystem.common.exception.ErrorCode;
 import com.nayoon.preordersystem.follow.dto.request.FollowRequest;
 import com.nayoon.preordersystem.follow.entity.Follow;
 import com.nayoon.preordersystem.follow.repository.FollowRepository;
+import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
+import com.nayoon.preordersystem.newsfeed.type.ActivityType;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import java.util.Objects;
@@ -41,9 +43,10 @@ public class FollowService {
         .followingUser(followingUser)
         .build();
 
-    followRepository.save(follow);
+    Follow saved = followRepository.save(follow);
 
-    // TODO: 팔로우 했다는 메세지 followingUser 피드에 등록 (followerUser가 당신을 팔로우했습니다.)
+    NewsfeedCreateRequest newsfeedCreateRequest =
+        NewsfeedCreateRequest.buildNewsfeedCreateRequest(followerId, saved, ActivityType.FOLLOW);
   }
 
   private boolean relationshipExists(Long followerUserId, Long followingUserId) {

@@ -1,5 +1,6 @@
 package com.nayoon.preordersystem.comment.entity;
 
+import com.nayoon.preordersystem.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentLike {
+public class CommentLike extends BaseEntity {
 
   @Id
   @Column(name = "comment_like_id")

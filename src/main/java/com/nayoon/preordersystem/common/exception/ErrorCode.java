@@ -43,6 +43,9 @@ public enum ErrorCode {
   COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
   ALREADY_LIKED_COMMENT(HttpStatus.BAD_REQUEST, "이미 좋아요한 게시물입니다."),
 
+  // NEWSFEED
+  MISSING_RELATED_USER_OR_ACTIVITY(HttpStatus.BAD_REQUEST, "뉴스피드 생성에 문제가 발생했습니다."),
+
 
   // ------ 5xx ------
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 발생했습니다."),

@@ -7,6 +7,9 @@ import com.nayoon.preordersystem.comment.repository.CommentLikeRepository;
 import com.nayoon.preordersystem.comment.repository.CommentRepository;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
+import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
+import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
+import com.nayoon.preordersystem.newsfeed.type.ActivityType;
 import com.nayoon.preordersystem.post.entity.Post;
 import com.nayoon.preordersystem.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final CommentLikeRepository commentLikeRepository;
+  private final NewsfeedService newsfeedService;
 
   /**
    *  댓글 생성 메서드
@@ -36,7 +40,14 @@ public class CommentService {
         .content(request.content())
         .build();
 
-    return commentRepository.save(comment).getId();
+    Comment saved = commentRepository.save(comment);
+
+    NewsfeedCreateRequest newsfeedCreateRequest =
+        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT);
+
+    newsfeedService.create(newsfeedCreateRequest);
+
+    return saved.getId();
   }
 
   /**
@@ -57,7 +68,12 @@ public class CommentService {
         .userId(userId)
         .build();
 
-    commentLikeRepository.save(commentLike);
+    CommentLike saved = commentLikeRepository.save(commentLike);
+
+    NewsfeedCreateRequest newsfeedCreateRequest =
+        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT_LIKE);
+
+    newsfeedService.create(newsfeedCreateRequest);
   }
 
 }
