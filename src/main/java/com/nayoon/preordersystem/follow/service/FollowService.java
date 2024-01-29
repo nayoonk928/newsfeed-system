@@ -7,6 +7,7 @@ import com.nayoon.preordersystem.follow.dto.request.FollowRequest;
 import com.nayoon.preordersystem.follow.entity.Follow;
 import com.nayoon.preordersystem.follow.repository.FollowRepository;
 import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
+import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
 import com.nayoon.preordersystem.newsfeed.type.ActivityType;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
@@ -21,6 +22,7 @@ public class FollowService {
 
   private final FollowRepository followRepository;
   private final UserRepository userRepository;
+  private final NewsfeedService newsfeedService;
 
   @Transactional
   public void follow(CustomUserDetails userDetails, FollowRequest request) {
@@ -47,6 +49,8 @@ public class FollowService {
 
     NewsfeedCreateRequest newsfeedCreateRequest =
         NewsfeedCreateRequest.buildNewsfeedCreateRequest(followerId, saved, ActivityType.FOLLOW);
+
+    newsfeedService.create(newsfeedCreateRequest);
   }
 
   private boolean relationshipExists(Long followerUserId, Long followingUserId) {

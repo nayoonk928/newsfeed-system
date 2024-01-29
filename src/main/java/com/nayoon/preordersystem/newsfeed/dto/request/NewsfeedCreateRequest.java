@@ -32,15 +32,15 @@ public record NewsfeedCreateRequest(
       activityId = post.getId();
       createdAt = post.getCreatedAt();
     } else if (savedObject instanceof PostLike postLike) {
-      relatedUserId = postLike.getUserId();
+      relatedUserId = postLike.getPost().getUserId();
       activityId = postLike.getId();
       createdAt = postLike.getCreatedAt();
     } else if (savedObject instanceof Comment comment) {
-      relatedUserId = comment.getUserId();
+      relatedUserId = comment.getPost().getUserId();
       activityId = comment.getId();
       createdAt = comment.getCreatedAt();
     } else if (savedObject instanceof CommentLike commentLike) {
-      relatedUserId = commentLike.getUserId();
+      relatedUserId = commentLike.getComment().getUserId();
       activityId = commentLike.getId();
       createdAt = commentLike.getCreatedAt();
     } else if (savedObject instanceof Follow follow) {
