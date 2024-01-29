@@ -4,14 +4,16 @@ import com.nayoon.preordersystem.auth.dto.TokenDto;
 import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.common.utils.EncryptionUtils;
 import com.nayoon.preordersystem.common.redis.service.RedisService;
+import com.nayoon.preordersystem.common.utils.EncryptionUtils;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -31,12 +33,17 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    TokenDto tokenDto = jwtTokenProvider.generateToken(user, user.getUserRole());
+    if (!user.getVerified()) {
+      throw new CustomException(ErrorCode.MUST_VERIFIED_EMAIL);
+    }
 
-    redisService.setValues("RT:" + user.getEmail(), tokenDto.refreshToken(),
-        tokenDto.refreshTokenExpiresTime(), TimeUnit.MILLISECONDS);
+    String accessToken = jwtTokenProvider.generateAccessToken(user);
+    String refreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-    return tokenDto;
+    Long expiresTime = jwtTokenProvider.getExpiredTime(refreshToken);
+    redisService.setValues("RT:" + user.getEmail(), refreshToken, expiresTime, TimeUnit.MILLISECONDS);
+
+    return new TokenDto(accessToken, refreshToken, expiresTime);
   }
 
 }
