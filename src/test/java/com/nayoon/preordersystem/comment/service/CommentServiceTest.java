@@ -23,7 +23,6 @@ import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.preordersystem.newsfeed.repository.NewsfeedRepository;
 import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
 import com.nayoon.preordersystem.post.entity.Post;
-import com.nayoon.preordersystem.post.entity.PostLike;
 import com.nayoon.preordersystem.post.repository.PostRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;

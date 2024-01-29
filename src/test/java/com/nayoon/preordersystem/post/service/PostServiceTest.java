@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.common.utils.EncryptionUtils;
 import com.nayoon.preordersystem.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.preordersystem.newsfeed.repository.NewsfeedRepository;
 import com.nayoon.preordersystem.newsfeed.service.NewsfeedService;
