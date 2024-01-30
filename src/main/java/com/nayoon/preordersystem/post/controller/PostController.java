@@ -3,6 +3,7 @@ package com.nayoon.preordersystem.post.controller;
 import com.nayoon.preordersystem.auth.security.CustomUserDetails;
 import com.nayoon.preordersystem.post.dto.request.PostCreateRequest;
 import com.nayoon.preordersystem.post.service.PostService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class PostController {
   @PostMapping
   public ResponseEntity<Void> createPost(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestBody PostCreateRequest request
+      @Valid @RequestBody PostCreateRequest request
   ) {
     Long postId = postService.createPost(userDetails.getId(), request);
     return ResponseEntity.created(URI.create("api/v1/posts/" + postId)).build();

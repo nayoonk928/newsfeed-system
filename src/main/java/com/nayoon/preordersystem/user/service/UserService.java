@@ -49,6 +49,10 @@ public class UserService {
    */
   @Transactional
   public String signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
+    if (imageFile.isEmpty()) {
+      throw new CustomException(ErrorCode.PROFILE_IMAGE_REQUIRED);
+    }
+
     // 비밀번호 암호화
     String encryptPassword = EncryptionUtils.encode(request.password());
 
@@ -119,7 +123,7 @@ public class UserService {
    * 이메일 인증 코드 유효성 확인 메서드
    */
   @Transactional
-  public boolean verifyCode(VerifyEmailRequest request) {
+  public void verifyCode(VerifyEmailRequest request) {
     boolean authCodeExists = redisService.checkEmailAuthCode(AUTH_PREFIX + request.email(), request.code());
 
     if (authCodeExists) {
@@ -133,10 +137,7 @@ public class UserService {
       }
 
       user.updateVerified(true);
-      return true;
     }
-
-    return false;
   }
 
   /**

@@ -48,7 +48,7 @@ public class UserController {
       @Valid @RequestPart("data") ProfileUpdateRequest request,
       @RequestPart(name = "profileImage", required = false) MultipartFile imageFile
   ) throws IOException {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.updateProfile(userDetails, request, imageFile));
+    return ResponseEntity.ok().body(userService.updateProfile(userDetails, request, imageFile));
   }
 
   /**
@@ -60,7 +60,7 @@ public class UserController {
       @Valid @RequestBody PasswordUpdateRequest request
   ) {
     userService.updatePassword(userDetails, request);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return ResponseEntity.ok().build();
   }
 
   /**
@@ -70,8 +70,7 @@ public class UserController {
   public ResponseEntity<String> sendEmail(
       @Valid @RequestBody String email
   ) {
-    userService.sendCode(email);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return ResponseEntity.ok().body(userService.sendCode(email));
   }
 
   /**
@@ -81,13 +80,8 @@ public class UserController {
   public ResponseEntity<Void> verifyEmail(
       @Valid @RequestBody VerifyEmailRequest request
   ) {
-    boolean isVerified = userService.verifyCode(request);
-
-    if (isVerified) {
-      return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    userService.verifyCode(request);
+    return ResponseEntity.ok().build();
   }
 
 }

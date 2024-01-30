@@ -21,8 +21,8 @@ public class MailService {
    * 이메일 전송 메서드
    */
   public void sendEmail(String toEmail, String title, String text) {
-    SimpleMailMessage email = createEmailForm(toEmail, title, text);
     try {
+      SimpleMailMessage email = createEmailForm(toEmail, title, text);
       mailSender.send(email);
     } catch (RuntimeException e) {
       log.debug("MailService.sendEmail exception occur email: {}, title: {}, text: {}", toEmail, title, text);

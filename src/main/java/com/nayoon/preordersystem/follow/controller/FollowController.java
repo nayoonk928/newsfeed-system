@@ -4,7 +4,6 @@ import com.nayoon.preordersystem.auth.security.CustomUserDetails;
 import com.nayoon.preordersystem.follow.dto.request.FollowRequest;
 import com.nayoon.preordersystem.follow.service.FollowService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +24,7 @@ public class FollowController {
       @RequestBody FollowRequest request
   ) {
     followService.follow(userDetails, request);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return ResponseEntity.ok().build();
   }
 
 }

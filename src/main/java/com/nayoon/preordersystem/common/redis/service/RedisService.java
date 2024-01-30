@@ -29,13 +29,18 @@ public class RedisService {
     redisTemplate.delete(key);
   }
 
-  public boolean checkEmailAuthCode(String key, Object value) {
-    if (keyExists(key)) {
-      Object storedValue = redisTemplate.opsForValue().get(key);
-      return storedValue != null && storedValue.equals(value);
-    } else {
+  public boolean checkEmailAuthCode(String key, String value) {
+    String storedValue = (String) redisTemplate.opsForValue().get(key);
+
+    if (storedValue == null) {
       throw new CustomException(ErrorCode.AUTH_CODE_EXPIRED);
     }
+
+    if (!storedValue.equals(value)) {
+      throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
+    }
+
+    return true;
   }
 
   public boolean checkExistsValue(String value) {

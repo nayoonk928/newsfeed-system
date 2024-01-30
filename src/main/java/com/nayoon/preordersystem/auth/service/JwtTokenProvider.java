@@ -80,6 +80,7 @@ public class JwtTokenProvider {
     // 토큰 생성
     String accessToken = Jwts.builder()
         .setSubject(user.getEmail())
+        .claim("email", user.getEmail())
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + refreshTokenValidationTime))
         .signWith(key, SignatureAlgorithm.HS256)
@@ -106,7 +107,7 @@ public class JwtTokenProvider {
       throw new CustomException(ErrorCode.INVALID_AUTHENTICATION_TOKEN);
     }
 
-    return parseClaims(token).getSubject();
+    return parseClaims(token).get("email").toString();
   }
 
   /**

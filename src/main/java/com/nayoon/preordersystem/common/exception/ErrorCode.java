@@ -17,6 +17,8 @@ public enum ErrorCode {
   AUTH_CODE_EXPIRED(HttpStatus.UNAUTHORIZED,"이메일 인증 코드가 만료되었습니다."),
   PASSWORD_NOT_CHANGED(HttpStatus.BAD_REQUEST,"이전 비밀번호와 동일합니다."),
   NOT_MATCHED_CURR_PASSWORD(HttpStatus.BAD_REQUEST,"현재 비밀번호가 올바르지 않습니다."),
+  PROFILE_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST,"프로필 이미지는 필수입니다."),
+  EMAIL_AUTH_CODE_INCORRECT(HttpStatus.UNAUTHORIZED,"이메일 인증 코드가 일치하지 않습니다."),
 
   // Email
   UNABLE_TO_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다"),
@@ -43,7 +45,7 @@ public enum ErrorCode {
 
   // COMMENT
   COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
-  ALREADY_LIKED_COMMENT(HttpStatus.BAD_REQUEST, "이미 좋아요한 게시물입니다."),
+  ALREADY_LIKED_COMMENT(HttpStatus.BAD_REQUEST, "이미 좋아요한 댓글입니다."),
 
   // NEWSFEED
   MISSING_RELATED_USER_OR_ACTIVITY(HttpStatus.BAD_REQUEST, "뉴스피드 생성에 문제가 발생했습니다."),
