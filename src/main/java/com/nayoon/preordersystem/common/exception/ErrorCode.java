@@ -30,6 +30,8 @@ public enum ErrorCode {
   INVALID_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
   EXPIRED_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
   NOT_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
+  ALREADY_LOGED_OUT(HttpStatus.UNAUTHORIZED, "이미 로그아웃한 계정입니다. 다시 로그인해주세요."),
+  MUST_VERIFIED_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 인증이 필요합니다."),
 
   // FOLLOW
   ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "이미 팔로우 중입니다."),
@@ -45,6 +47,10 @@ public enum ErrorCode {
 
   // NEWSFEED
   MISSING_RELATED_USER_OR_ACTIVITY(HttpStatus.BAD_REQUEST, "뉴스피드 생성에 문제가 발생했습니다."),
+
+  // REFRESH_TOKEN
+  REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Refresh Token이 존재하지 않습니다."),
+  TOKEN_IS_NOT_SAME(HttpStatus.BAD_REQUEST, "Refresh Token이 동일하지 않습니다."),
 
 
   // ------ 5xx ------

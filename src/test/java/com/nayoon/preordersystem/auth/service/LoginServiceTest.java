@@ -13,8 +13,8 @@ import com.nayoon.preordersystem.auth.dto.TokenDto;
 import com.nayoon.preordersystem.auth.dto.request.LoginRequest;
 import com.nayoon.preordersystem.common.exception.CustomException;
 import com.nayoon.preordersystem.common.exception.ErrorCode;
-import com.nayoon.preordersystem.common.utils.EncryptionUtils;
 import com.nayoon.preordersystem.common.redis.service.RedisService;
+import com.nayoon.preordersystem.common.utils.EncryptionUtils;
 import com.nayoon.preordersystem.user.entity.User;
 import com.nayoon.preordersystem.user.repository.UserRepository;
 import com.nayoon.preordersystem.user.type.UserRole;
@@ -74,7 +74,10 @@ class LoginServiceTest {
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
       when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-      when(jwtTokenProvider.generateToken(user, user.getUserRole())).thenReturn(tokenDto);
+      when(jwtTokenProvider.generateAccessToken(user)).thenReturn(tokenDto.accessToken());
+      when(jwtTokenProvider.generateRefreshToken(user)).thenReturn(tokenDto.refreshToken());
+      when(jwtTokenProvider.getExpiredTime(tokenDto.refreshToken())).thenReturn(
+          tokenDto.refreshTokenExpiresTime());
 
       //when
       TokenDto result = loginService.login(request);
@@ -82,6 +85,7 @@ class LoginServiceTest {
       //then
       assertNotNull(result);
       assertEquals(tokenDto, result);
+      verify(userRepository, times(1)).findByEmail(user.getEmail());
       verify(redisService, times(1)).setValues(eq("RT:" + user.getEmail()),
           eq(tokenDto.refreshToken()), eq(tokenDto.refreshTokenExpiresTime()),
           eq(TimeUnit.MILLISECONDS));
@@ -119,6 +123,24 @@ class LoginServiceTest {
       assertEquals(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD, exception.getErrorCode());
     }
 
+    @Test
+    @DisplayName("실패: 이메일 인증 하지 않음")
+    void notVerifiedEmail() {
+      //given
+      User user = createUser(false);
+      LoginRequest request = createInvalidLoginRequest();
+
+      when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+      when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
+
+      //when
+      CustomException exception = assertThrows(CustomException.class,
+          () -> loginService.login(request));
+
+      //then
+      assertEquals(ErrorCode.MUST_VERIFIED_EMAIL, exception.getErrorCode());
+    }
+
   }
 
   private LoginRequest createLoginRequest() {
@@ -141,11 +163,7 @@ class LoginServiceTest {
   }
 
   private TokenDto createTokenDto() {
-    return TokenDto.builder()
-        .accessToken("accessToken")
-        .refreshToken("refreshToken")
-        .refreshTokenExpiresTime(1000L)
-        .build();
+    return new TokenDto("accessToken", "refreshToken", 1000L);
   }
 
 }

@@ -22,7 +22,7 @@ public class RedisService {
   }
 
   public boolean keyExists(String key) {
-    return redisTemplate.hasKey(key);
+    return Boolean.TRUE.equals(redisTemplate.hasKey(key));
   }
 
   public void deleteKey(String key) {
@@ -36,6 +36,10 @@ public class RedisService {
     } else {
       throw new CustomException(ErrorCode.AUTH_CODE_EXPIRED);
     }
+  }
+
+  public boolean checkExistsValue(String value) {
+    return !value.equals("false");
   }
 
 }
