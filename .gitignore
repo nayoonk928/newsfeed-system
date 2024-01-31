@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/
+/postgres/
+/.env
 /src/main/generated/
-/db/
