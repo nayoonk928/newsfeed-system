@@ -18,6 +18,21 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - uses: actions/checkout@v3
+      with:
+        repository: preorder-system/user_service
+        path: user_service
+
+    - uses: actions/checkout@v3
+      with:
+        repository: preorder-system/newsfeed_service
+        path: newsfeed_service
+
+    - uses: actions/checkout@v3
+      with:
+        repository: preorder-system/activity_service
+        path: activity_service
+
     - name: Gradle Caching
       uses: actions/cache@v3
       with:
@@ -49,7 +64,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build and Test with Gradle
+    - name: Build and Test user_service with Gradle
       run: ./gradlew build jacocoTestReport
 
     - name: Publish test result
