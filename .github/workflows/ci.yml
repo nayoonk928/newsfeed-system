@@ -43,14 +43,8 @@ jobs:
     - name: Set Test Yaml
       run: |
         mkdir -p src/main/resources
-        mkdir -p activity_service/src/main/resources
-        mkdir -p newsfeed_service/src/main/resources
-        mkdir -p user_service/src/main/resources
         echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > src/main/resources/application-test.yml
-        echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > activity_service/src/main/resources/application-test.yml
-        echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > newsfeed_service/src/main/resources/application-test.yml
-        echo "${{ secrets.APPLICATION_TEST }}" | base64 --decode > user_service/src/main/resources/application-test.yml
-        find src user_service/src activity_service/src newsfeed_service/src
+        find src
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
