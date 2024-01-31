@@ -20,17 +20,17 @@ jobs:
 
     - uses: actions/checkout@v3
       with:
-        repository: preorder-system/user_service
+        repository: user_service
         path: user_service
 
     - uses: actions/checkout@v3
       with:
-        repository: preorder-system/newsfeed_service
+        repository: newsfeed_service
         path: newsfeed_service
 
     - uses: actions/checkout@v3
       with:
-        repository: preorder-system/activity_service
+        repository: activity_service
         path: activity_service
 
     - name: Gradle Caching
