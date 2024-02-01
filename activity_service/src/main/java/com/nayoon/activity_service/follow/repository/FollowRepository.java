@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 
-  boolean existsByFollowerUserIdAndFollowingUserId(Long followerUserId, Long followingUserId);
+  boolean existsByFollowerIdAndFollowingId(Long followerUserId, Long followingUserId);
 
-  @Query("SELECT f FROM Follow f WHERE f.followerUser.id = :userId")
+  @Query("SELECT f FROM Follow f WHERE f.followerId = :userId")
   List<Follow> findFollowing(Long userId);
 
 }

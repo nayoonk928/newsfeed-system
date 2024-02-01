@@ -1,17 +1,16 @@
 package com.nayoon.activity_service.comment.controller;
 
-import com.nayoon.activity_service.auth.security.CustomUserDetails;
 import com.nayoon.activity_service.comment.dto.request.CommentCreateRequest;
 import com.nayoon.activity_service.comment.service.CommentService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,10 +25,10 @@ public class CommentController {
    */
   @PostMapping
   public ResponseEntity<Void> createComment(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(name = "user", required = false) Long principalId,
       @Valid @RequestBody CommentCreateRequest request
   ) {
-    Long commentId = commentService.createComment(userDetails.getId(), request);
+    Long commentId = commentService.createComment(principalId, request);
     return ResponseEntity.created(URI.create("api/v1/comments/" + commentId)).build();
   }
 
@@ -38,10 +37,10 @@ public class CommentController {
    */
   @PostMapping("/{id}/like")
   public ResponseEntity<Void> likeComment(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(name = "user", required = false) Long principalId,
       @PathVariable("id") Long commentId
   ) {
-    commentService.likeComment(userDetails.getId(), commentId);
+    commentService.likeComment(principalId, commentId);
     return ResponseEntity.ok().build();
   }
 

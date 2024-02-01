@@ -1,16 +1,10 @@
 package com.nayoon.activity_service.follow.service;
 
-import com.nayoon.activity_service.auth.security.CustomUserDetails;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
 import com.nayoon.activity_service.follow.entity.Follow;
 import com.nayoon.activity_service.follow.repository.FollowRepository;
-import com.nayoon.activity_service.newsfeed.dto.request.NewsfeedCreateRequest;
-import com.nayoon.activity_service.newsfeed.service.NewsfeedService;
-import com.nayoon.activity_service.newsfeed.type.ActivityType;
-import com.nayoon.activity_service.user.entity.User;
-import com.nayoon.activity_service.user.repository.UserRepository;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,45 +15,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class FollowService {
 
   private final FollowRepository followRepository;
-  private final UserRepository userRepository;
-  private final NewsfeedService newsfeedService;
-
   @Transactional
-  public void follow(CustomUserDetails userDetails, FollowRequest request) {
-    Long followerId = userDetails.getId();
+  public void follow(Long principalId, FollowRequest request) {
+    Long followerId = request.followerUserId();
     Long followingId = request.followingUserId();
 
-    if (Objects.equals(followerId, followingId)) {
+    if (Objects.equals(principalId, followingId)) {
       throw new CustomException(ErrorCode.CANNOT_FOLLOW_SELF);
     }
 
-    User followerUser = findUser(followerId);
-    User followingUser = findUser(followingId);
-
-    if (relationshipExists(followerId, followingId)) {
-      throw new CustomException(ErrorCode.ALREADY_FOLLOWING);
-    }
+    checkAuthorized(principalId, followerId);
+    relationshipExists(principalId, followingId);
 
     Follow follow = Follow.builder()
-        .followerUser(followerUser)
-        .followingUser(followingUser)
+        .followerId(principalId)
+        .followingId(followingId)
         .build();
 
     Follow saved = followRepository.save(follow);
 
-    NewsfeedCreateRequest newsfeedCreateRequest =
-        NewsfeedCreateRequest.buildNewsfeedCreateRequest(followerId, saved, ActivityType.FOLLOW);
-
-    newsfeedService.create(newsfeedCreateRequest);
+    // TODO: 뉴스피드에 팔로우 기록 추가
+//    NewsfeedCreateRequest newsfeedCreateRequest =
+//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(followerId, saved, ActivityType.FOLLOW);
+//
+//    newsfeedService.create(newsfeedCreateRequest);
   }
 
-  private boolean relationshipExists(Long followerUserId, Long followingUserId) {
-    return followRepository.existsByFollowerUserIdAndFollowingUserId(followerUserId, followingUserId);
+  private void relationshipExists(Long followerUserId, Long followingUserId) {
+    if (followRepository.existsByFollowerIdAndFollowingId(followerUserId, followingUserId)){
+      throw new CustomException(ErrorCode.ALREADY_FOLLOWING);
+    }
   }
 
-  private User findUser(Long id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+  private void checkAuthorized(Long principalId, Long followerId) {
+    if (!principalId.equals(followerId)) {
+      throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+    }
   }
 
 }

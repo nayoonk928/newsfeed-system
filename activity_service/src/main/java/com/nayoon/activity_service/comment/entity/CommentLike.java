@@ -15,7 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "comment_likes")
+@Table(name = "comment_like")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,11 +33,15 @@ public class CommentLike extends BaseEntity {
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
+  @Column(name = "liked", nullable = false)
+  private Boolean liked;
+
   @Builder
-  public CommentLike(Long id, Comment comment, Long userId) {
+  public CommentLike(Long id, Comment comment, Long userId, Boolean liked) {
     this.id = id;
     this.comment = comment;
     this.userId = userId;
+    this.liked = liked;
   }
 
 }

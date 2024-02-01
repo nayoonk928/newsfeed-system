@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "posts")
+@Table(name = "post")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

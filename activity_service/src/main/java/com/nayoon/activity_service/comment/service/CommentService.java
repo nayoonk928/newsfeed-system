@@ -7,9 +7,6 @@ import com.nayoon.activity_service.comment.repository.CommentLikeRepository;
 import com.nayoon.activity_service.comment.repository.CommentRepository;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
-import com.nayoon.activity_service.newsfeed.dto.request.NewsfeedCreateRequest;
-import com.nayoon.activity_service.newsfeed.service.NewsfeedService;
-import com.nayoon.activity_service.newsfeed.type.ActivityType;
 import com.nayoon.activity_service.post.entity.Post;
 import com.nayoon.activity_service.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +20,6 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final CommentLikeRepository commentLikeRepository;
-  private final NewsfeedService newsfeedService;
 
   /**
    *  댓글 생성 메서드
@@ -42,10 +38,11 @@ public class CommentService {
 
     Comment saved = commentRepository.save(comment);
 
-    NewsfeedCreateRequest newsfeedCreateRequest =
-        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT);
-
-    newsfeedService.create(newsfeedCreateRequest);
+    // TODO: 뉴스피드에 댓글 활동 등록
+//    NewsfeedCreateRequest newsfeedCreateRequest =
+//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT);
+//
+//    newsfeedService.create(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -70,10 +67,11 @@ public class CommentService {
 
     CommentLike saved = commentLikeRepository.save(commentLike);
 
-    NewsfeedCreateRequest newsfeedCreateRequest =
-        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT_LIKE);
-
-    newsfeedService.create(newsfeedCreateRequest);
+    // TODO: 뉴스피드에 댓글 좋아요 활동 등록
+//    NewsfeedCreateRequest newsfeedCreateRequest =
+//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT_LIKE);
+//
+//    newsfeedService.create(newsfeedCreateRequest);
   }
 
 }
