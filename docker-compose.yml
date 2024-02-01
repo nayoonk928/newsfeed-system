@@ -45,7 +45,7 @@ services:
     image: adminer
     container_name: adminer
     ports:
-      - "8081:8081"
+      - "8088:8088"
 
   zookeeper:
     image: wurstmeister/zookeeper
