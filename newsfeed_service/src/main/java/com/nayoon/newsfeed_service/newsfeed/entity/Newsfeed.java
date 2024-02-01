@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
-@Table(name = "newsfeeds")
+@Table(name = "newsfeed")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(value = {AuditingEntityListener.class})
 public class Newsfeed {
@@ -29,19 +29,19 @@ public class Newsfeed {
   @Column(name = "newsfeed_id", updatable = false)
   private Long id;
 
-  @Column(name = "action_user_id", nullable = false)
+  @Column(name = "action_user_id")
   private Long actionUserId;
 
-  @Column(name = "related_user_id", nullable = false)
+  @Column(name = "related_user_id")
   private Long relatedUserId;
 
-  @Column(name = "activity_id", nullable = false)
+  @Column(name = "activity_id")
   private Long activityId;
 
   @Enumerated(EnumType.STRING)
   private ActivityType activityType;
 
-  @Column(name = "created_at", nullable = false, updatable = false)
+  @Column(name = "created_at")
   private LocalDateTime createdAt;
 
   @Builder

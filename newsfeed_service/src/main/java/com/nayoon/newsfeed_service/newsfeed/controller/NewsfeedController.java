@@ -1,6 +1,5 @@
 package com.nayoon.newsfeed_service.newsfeed.controller;
 
-import com.nayoon.newsfeed_service.auth.security.CustomUserDetails;
 import com.nayoon.newsfeed_service.newsfeed.dto.response.NewsfeedResponse;
 import com.nayoon.newsfeed_service.newsfeed.service.NewsfeedService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +25,7 @@ public class NewsfeedController {
    */
   @GetMapping
   public ResponseEntity<Page<NewsfeedResponse>> myNewsfeed(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(name = "user", required = false) Long principalId,
       @RequestParam(value = "orderBy", defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "sortBy", defaultValue = "desc") String sortBy,
       @RequestParam(value = "pageCount", defaultValue = "20") int size,
@@ -37,7 +35,7 @@ public class NewsfeedController {
     Sort sort = Sort.by(direction, orderBy);
     Pageable pageable = PageRequest.of(page, size, sort);
 
-    Page<NewsfeedResponse> newsfeeds = newsfeedService.myNewsfeed(userDetails.getId(), pageable)
+    Page<NewsfeedResponse> newsfeeds = newsfeedService.myNewsfeed(principalId, pageable)
         .map(NewsfeedResponse::from);
     return ResponseEntity.ok().body(newsfeeds);
   }

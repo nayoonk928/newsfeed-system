@@ -1,4 +1,4 @@
-package com.nayoon.newsfeed_service.common.exception;
+package com.nayoon.newsfeed_service.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

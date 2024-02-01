@@ -1,4 +1,4 @@
-package com.nayoon.newsfeed_service.common.exception;
+package com.nayoon.newsfeed_service.exception;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

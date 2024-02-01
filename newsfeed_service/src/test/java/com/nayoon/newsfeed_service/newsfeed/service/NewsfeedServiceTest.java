@@ -2,18 +2,15 @@ package com.nayoon.newsfeed_service.newsfeed.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.nayoon.newsfeed_service.follow.entity.Follow;
-import com.nayoon.newsfeed_service.follow.repository.FollowRepository;
 import com.nayoon.newsfeed_service.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.newsfeed_service.newsfeed.entity.Newsfeed;
 import com.nayoon.newsfeed_service.newsfeed.repository.NewsfeedRepository;
 import com.nayoon.newsfeed_service.newsfeed.type.ActivityType;
-import com.nayoon.newsfeed_service.user.entity.User;
-import com.nayoon.newsfeed_service.user.type.UserRole;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,9 +34,6 @@ class NewsfeedServiceTest {
 
   @Mock
   private NewsfeedRepository newsfeedRepository;
-
-  @Mock
-  private FollowRepository followRepository;
 
   @Nested
   @DisplayName("뉴스피드 생성")
@@ -76,19 +71,20 @@ class NewsfeedServiceTest {
       Long userId = 1L;
       Pageable pageable = Pageable.ofSize(10).withPage(0);
 
+      // TODO: 서비스 코드 변경에 따라 수정 필요
       // Mock data for followingIds
-      List<Follow> followingList = Arrays.asList(
-          new Follow(createUser2(true), createUser1(true)),
-          new Follow(createUser3(true), createUser1(true))
-      );
-      when(followRepository.findFollowing(userId)).thenReturn(followingList);
+//      List<Follow> followingList = Arrays.asList(
+//          new Follow(createUser2(true), createUser1(true)),
+//          new Follow(createUser3(true), createUser1(true))
+//      );
+//      when(followRepository.findFollowing(userId)).thenReturn(followingList);
 
       // Mock data for newsfeeds
       List<Newsfeed> newsfeeds = Arrays.asList(
           new Newsfeed(1L, 2L, 1L, ActivityType.COMMENT, LocalDateTime.now()),
           new Newsfeed(2L, 3L, 1L, ActivityType.COMMENT, LocalDateTime.now())
       );
-      when(newsfeedRepository.filterNewsfeeds(userId, Arrays.asList(1L, 1L), pageable)).thenReturn(
+      when(newsfeedRepository.filterNewsfeeds(eq(userId), ArgumentMatchers.anyList(), eq(pageable))).thenReturn(
           new PageImpl<>(newsfeeds));
 
       //when
@@ -98,45 +94,6 @@ class NewsfeedServiceTest {
       assertEquals(newsfeeds, result.getContent());
     }
 
-  }
-
-  private User createUser1(boolean verified) {
-    return User.builder()
-        .id(1L)
-        .email("test1@example.com")
-        .name("Test User 1")
-        .password("encoded_password")
-        .greeting("Hello, I'm a test user.")
-        .profileImage("s3///image/jpeg")
-        .userRole(UserRole.USER)
-        .verified(verified)
-        .build();
-  }
-
-  private User createUser2(boolean verified) {
-    return User.builder()
-        .id(2L)
-        .email("test2@example.com")
-        .name("Test User 2")
-        .password("encoded_password")
-        .greeting("Hello, I'm a test user.")
-        .profileImage("s3///image/jpeg")
-        .userRole(UserRole.USER)
-        .verified(verified)
-        .build();
-  }
-
-  private User createUser3(boolean verified) {
-    return User.builder()
-        .id(3L)
-        .email("test3@example.com")
-        .name("Test User 3")
-        .password("encoded_password")
-        .greeting("Hello, I'm a test user.")
-        .profileImage("s3///image/jpeg")
-        .userRole(UserRole.USER)
-        .verified(verified)
-        .build();
   }
 
 }

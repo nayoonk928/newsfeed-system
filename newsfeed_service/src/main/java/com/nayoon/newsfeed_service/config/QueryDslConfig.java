@@ -1,4 +1,4 @@
-package com.nayoon.user_service.common.config;
+package com.nayoon.newsfeed_service.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
