@@ -1,0 +1,26 @@
+dependencies {
+    // 이메일 인증
+    api 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Redis
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // AWS S3
+    api 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // jwt
+    api 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+// prepareKotlinBuildScriptModel 오류 방지
+tasks.register("prepareKotlinBuildScriptModel") {}

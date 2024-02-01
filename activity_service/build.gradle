@@ -1,0 +1,14 @@
+dependencies {
+
+}
+
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
+// prepareKotlinBuildScriptModel 오류 방지
+tasks.register("prepareKotlinBuildScriptModel") {}
