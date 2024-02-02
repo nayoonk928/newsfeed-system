@@ -2,9 +2,6 @@ package com.nayoon.activity_service.post.service;
 
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
-import com.nayoon.activity_service.newsfeed.dto.request.NewsfeedCreateRequest;
-import com.nayoon.activity_service.newsfeed.service.NewsfeedService;
-import com.nayoon.activity_service.newsfeed.type.ActivityType;
 import com.nayoon.activity_service.post.dto.request.PostCreateRequest;
 import com.nayoon.activity_service.post.entity.Post;
 import com.nayoon.activity_service.post.entity.PostLike;
@@ -20,7 +17,6 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
-  private final NewsfeedService newsfeedService;
 
   /**
    *  게시글 생성 메서드
@@ -35,10 +31,11 @@ public class PostService {
 
     Post saved = postRepository.save(post);
 
-    NewsfeedCreateRequest newsfeedCreateRequest =
-        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST);
-
-    newsfeedService.create(newsfeedCreateRequest);
+    // TODO: 게시글 활동 뉴스피드에 등록
+//    NewsfeedCreateRequest newsfeedCreateRequest =
+//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST);
+//
+//    newsfeedService.create(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -63,10 +60,11 @@ public class PostService {
 
     PostLike saved = postLikeRepository.save(postLike);
 
-    NewsfeedCreateRequest newsfeedCreateRequest =
-        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST_LIKE);
-
-    newsfeedService.create(newsfeedCreateRequest);
+    // TODO: 게시글 좋아요 활동 뉴스피드에 등록
+//    NewsfeedCreateRequest newsfeedCreateRequest =
+//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST_LIKE);
+//
+//    newsfeedService.create(newsfeedCreateRequest);
   }
 
 }

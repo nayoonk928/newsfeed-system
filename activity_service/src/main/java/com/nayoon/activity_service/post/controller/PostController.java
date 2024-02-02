@@ -1,17 +1,16 @@
 package com.nayoon.activity_service.post.controller;
 
-import com.nayoon.activity_service.auth.security.CustomUserDetails;
 import com.nayoon.activity_service.post.dto.request.PostCreateRequest;
 import com.nayoon.activity_service.post.service.PostService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,10 +25,10 @@ public class PostController {
    */
   @PostMapping
   public ResponseEntity<Void> createPost(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(name = "user", required = false) Long principalId,
       @Valid @RequestBody PostCreateRequest request
   ) {
-    Long postId = postService.createPost(userDetails.getId(), request);
+    Long postId = postService.createPost(principalId, request);
     return ResponseEntity.created(URI.create("api/v1/posts/" + postId)).build();
   }
 
@@ -38,10 +37,10 @@ public class PostController {
    */
   @PostMapping("/{id}/like")
   public ResponseEntity<Void> likePost(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(name = "user", required = false) Long principalId,
       @PathVariable("id") Long postId
   ) {
-    postService.likePost(userDetails.getId(), postId);
+    postService.likePost(principalId, postId);
     return ResponseEntity.ok().build();
   }
 

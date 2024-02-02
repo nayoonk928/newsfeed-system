@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record FollowRequest(
     @NotBlank
+    Long followerUserId,
+    @NotBlank
     Long followingUserId
 ) {
 
