@@ -50,7 +50,9 @@ public class UserService {
     checkDuplicatedEmail(request.email());
 
     // 이메일 인증 코드 확인
-    verifyCode(request.email());
+    if (!verifyCode(request.email(), request.code())) {
+      throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
+    }
 
     User user = User.builder()
         .email(request.email())
@@ -79,22 +81,20 @@ public class UserService {
     }
   }
 
-  /**
-   * 이메일 인증 코드 유효성 확인 메서드
-   */
-  @Transactional
-  public void verifyCode(String email) {
-    String authCode = (String) redisService.getValue(AUTH_PREFIX + email);
+  // 이메일 인증 코드 유효성 확인 메서드
+  private boolean verifyCode(String email, String code) {
+    String authCode = redisService.getValue(AUTH_PREFIX + email);
 
     if (authCode == null) {
       throw new CustomException(ErrorCode.AUTH_CODE_EXPIRED);
     }
 
-    if (authCode.equals(email)) {
+    if (authCode.equals(code)) {
       redisService.deleteKey(AUTH_PREFIX + email);
-    } else {
-      throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
+      return true;
     }
+
+    return false;
   }
 
   /**

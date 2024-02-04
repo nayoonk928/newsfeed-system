@@ -33,13 +33,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
+@TestPropertySource(properties = "eureka.client.enabled=false")
 class UserServiceTest {
 
   @InjectMocks
@@ -78,6 +81,8 @@ class UserServiceTest {
       MultipartFile file = createMultipartFile();
 
       when(userRepository.existsByEmail(request.email())).thenReturn(false);
+      when(redisService.getValue(Mockito.anyString())).thenReturn(request.code());
+      System.out.println(request.code());
 
       //when
       userService.signup(request, file);
@@ -202,6 +207,7 @@ class UserServiceTest {
         .name("Test User")
         .password("password")
         .greeting("Hello, I'm a test user.")
+        .code("123456")
         .userRole(UserRole.USER)
         .build();
   }
@@ -214,7 +220,6 @@ class UserServiceTest {
         .greeting("Hello, I'm a test user.")
         .profileImage("s3///image/jpeg")
         .userRole(UserRole.USER)
-        .verified(verified)
         .build();
   }
 

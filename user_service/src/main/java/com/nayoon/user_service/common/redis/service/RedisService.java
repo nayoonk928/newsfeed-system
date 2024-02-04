@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisService {
 
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final RedisTemplate<String, String> redisTemplate;
 
-  public void setValues(String key, Object value, Long expiration, TimeUnit timeUnit) {
+  public void setValues(String key, String value, Long expiration, TimeUnit timeUnit) {
     redisTemplate.opsForValue().set(key, value, expiration, timeUnit);
   }
 
-  public Object getValue(String key) {
+  public String getValue(String key) {
     return redisTemplate.opsForValue().get(key);
   }
 
