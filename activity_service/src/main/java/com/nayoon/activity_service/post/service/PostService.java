@@ -25,7 +25,6 @@ public class PostService {
   public Long createPost(Long userId, PostCreateRequest request) {
     Post post = Post.builder()
         .userId(userId)
-        .title(request.title())
         .content(request.content())
         .build();
 

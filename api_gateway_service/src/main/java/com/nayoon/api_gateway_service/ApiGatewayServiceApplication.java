@@ -1,4 +1,4 @@
-package com.nayoon.activity_service;
+package com.nayoon.api_gateway_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-public class ActivityServiceApplication {
+public class ApiGatewayServiceApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ActivityServiceApplication.class, args);
+    SpringApplication.run(ApiGatewayServiceApplication.class, args);
   }
 
 }
