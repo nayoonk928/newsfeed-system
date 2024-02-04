@@ -1,5 +1,7 @@
 package com.nayoon.activity_service.comment.service;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
+import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.comment.dto.request.CommentCreateRequest;
 import com.nayoon.activity_service.comment.entity.Comment;
 import com.nayoon.activity_service.comment.entity.CommentLike;
@@ -20,29 +22,33 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final CommentLikeRepository commentLikeRepository;
+  private final NewsfeedClient newsfeedClient;
 
   /**
    *  댓글 생성 메서드
    */
   @Transactional
-  public Long createComment(Long userId, CommentCreateRequest request) {
+  public Long createComment(Long principalId, CommentCreateRequest request) {
 
     Post post = postRepository.findById(request.postId())
         .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     Comment comment = Comment.builder()
-        .userId(userId)
+        .userId(principalId)
         .post(post)
         .content(request.content())
         .build();
 
     Comment saved = commentRepository.save(comment);
 
-    // TODO: 뉴스피드에 댓글 활동 등록
-//    NewsfeedCreateRequest newsfeedCreateRequest =
-//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT);
-//
-//    newsfeedService.create(newsfeedCreateRequest);
+    NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
+        .actionUserId(principalId)
+        .relatedUserId(post.getUserId())
+        .activityId(saved.getId())
+        .activityType("comment")
+        .build();
+
+    newsfeedClient.create(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -51,27 +57,30 @@ public class CommentService {
    * 댓글 좋아요 메서드
    */
   @Transactional
-  public void likeComment(Long userId, Long commentId) {
+  public void likeComment(Long principalId, Long commentId) {
 
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
-    if (commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
+    if (commentLikeRepository.existsByCommentIdAndUserId(commentId, principalId)) {
       throw new CustomException(ErrorCode.ALREADY_LIKED_COMMENT);
     }
 
     CommentLike commentLike = CommentLike.builder()
         .comment(comment)
-        .userId(userId)
+        .userId(principalId)
         .build();
 
     CommentLike saved = commentLikeRepository.save(commentLike);
 
-    // TODO: 뉴스피드에 댓글 좋아요 활동 등록
-//    NewsfeedCreateRequest newsfeedCreateRequest =
-//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.COMMENT_LIKE);
-//
-//    newsfeedService.create(newsfeedCreateRequest);
+    NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
+        .actionUserId(principalId)
+        .relatedUserId(comment.getUserId())
+        .activityId(saved.getId())
+        .activityType("comment_like")
+        .build();
+
+    newsfeedClient.create(newsfeedCreateRequest);
   }
 
 }

@@ -1,5 +1,6 @@
 package com.nayoon.newsfeed_service.newsfeed.service;
 
+import com.nayoon.newsfeed_service.client.ActivityClient;
 import com.nayoon.newsfeed_service.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.newsfeed_service.newsfeed.entity.Newsfeed;
 import com.nayoon.newsfeed_service.newsfeed.repository.NewsfeedRepository;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NewsfeedService {
 
   private final NewsfeedRepository newsfeedRepository;
+  private final ActivityClient activityClient;
 
   /**
    * 뉴스피드 생성
@@ -35,17 +37,11 @@ public class NewsfeedService {
   /**
    * 나의 뉴스피드 조회
    */
-  public Page<Newsfeed> myNewsfeed(Long userId, Pageable pageable) {
-//    List<Long> followingIds = followRepository.findFollowing(userId).stream()
-//        .map(Follow::getFollowingUser)
-//        .map(User::getId)
-//        .toList();
-    // TODO : activity service에서 principalId에 해당하는 모든 following ids 가져오기
-    List<Long> followingIds = List.of();
+  public Page<Newsfeed> myNewsfeed(Long principalId, Pageable pageable) {
+    // 팔로우한 모든 사람들의 아이디 조회
+    List<Long> followingIds = activityClient.findFollowingIds(principalId).ids();
 
-    Page<Newsfeed> filteredNewsfeeds = newsfeedRepository.filterNewsfeeds(userId, followingIds, pageable);
-
-    return filteredNewsfeeds;
+    return newsfeedRepository.filterNewsfeeds(principalId, followingIds, pageable);
   }
 
 }

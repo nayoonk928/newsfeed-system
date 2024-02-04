@@ -24,11 +24,11 @@ public class PostController {
    * 게시글 생성
    */
   @PostMapping
-  public ResponseEntity<Void> createPost(
+  public ResponseEntity<Void> create(
       @RequestParam(name = "user", required = false) Long principalId,
       @Valid @RequestBody PostCreateRequest request
   ) {
-    Long postId = postService.createPost(principalId, request);
+    Long postId = postService.create(principalId, request);
     return ResponseEntity.created(URI.create("api/v1/posts/" + postId)).build();
   }
 
@@ -36,11 +36,11 @@ public class PostController {
    * 게시글 좋아요 기능
    */
   @PostMapping("/{id}/like")
-  public ResponseEntity<Void> likePost(
+  public ResponseEntity<Void> like(
       @RequestParam(name = "user", required = false) Long principalId,
       @PathVariable("id") Long postId
   ) {
-    postService.likePost(principalId, postId);
+    postService.like(principalId, postId);
     return ResponseEntity.ok().build();
   }
 
