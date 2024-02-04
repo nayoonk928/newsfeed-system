@@ -4,8 +4,8 @@ import com.nayoon.user_service.auth.security.CustomUserDetails;
 import com.nayoon.user_service.user.dto.request.PasswordUpdateRequest;
 import com.nayoon.user_service.user.dto.request.ProfileUpdateRequest;
 import com.nayoon.user_service.user.dto.request.SignUpRequest;
-import com.nayoon.user_service.user.dto.request.VerifyEmailRequest;
 import com.nayoon.user_service.user.dto.response.UserResponse;
+import com.nayoon.user_service.user.dto.response.UserSignUpResponse;
 import com.nayoon.user_service.user.service.UserService;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class UserController {
    * 회원가입 컨트롤러
    */
   @PostMapping("/signup")
-  public ResponseEntity<String> signup(
+  public ResponseEntity<UserSignUpResponse> signup(
       @Valid @RequestPart("data") SignUpRequest request,
       @RequestPart(name = "profileImage") MultipartFile imageFile
   ) throws IOException {
@@ -60,27 +60,6 @@ public class UserController {
       @Valid @RequestBody PasswordUpdateRequest request
   ) {
     userService.updatePassword(userDetails, request);
-    return ResponseEntity.ok().build();
-  }
-
-  /**
-   * 인증 메일 전송 컨트롤러
-   */
-  @PostMapping("/emails")
-  public ResponseEntity<String> sendEmail(
-      @Valid @RequestBody String email
-  ) {
-    return ResponseEntity.ok().body(userService.sendCode(email));
-  }
-
-  /**
-   * 인증 코드 확인 컨트롤러
-   */
-  @PostMapping("/emails/verifications")
-  public ResponseEntity<Void> verifyEmail(
-      @Valid @RequestBody VerifyEmailRequest request
-  ) {
-    userService.verifyCode(request);
     return ResponseEntity.ok().build();
   }
 

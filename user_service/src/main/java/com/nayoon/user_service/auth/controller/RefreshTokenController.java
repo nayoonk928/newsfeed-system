@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/refreshToken")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class RefreshTokenController {
 
@@ -21,7 +21,7 @@ public class RefreshTokenController {
   /**
    * accessToken 재발급
    */
-  @PostMapping
+  @PostMapping("/refreshToken")
   public ResponseEntity<Void> refresh(
       HttpServletRequest request,
       HttpServletResponse response

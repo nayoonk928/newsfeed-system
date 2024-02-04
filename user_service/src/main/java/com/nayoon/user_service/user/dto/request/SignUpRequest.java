@@ -24,6 +24,9 @@ public record SignUpRequest(
     @NotBlank(message = "인사말을 등록해주세요.")
     String greeting,
 
+    @NotBlank(message = "이메일로 전송된 인증코드를 입력해주세요.")
+    String code,
+
     @NotNull(message = "사용자 유형을 선택해주세요.")
     UserRole userRole
 ) {

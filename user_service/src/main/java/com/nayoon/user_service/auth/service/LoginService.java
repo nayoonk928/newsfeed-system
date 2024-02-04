@@ -33,10 +33,6 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    if (!user.getVerified()) {
-      throw new CustomException(ErrorCode.MUST_VERIFIED_EMAIL);
-    }
-
     String accessToken = jwtTokenProvider.generateAccessToken(user);
     String refreshToken = jwtTokenProvider.generateRefreshToken(user);
 

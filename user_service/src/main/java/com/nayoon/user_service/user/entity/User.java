@@ -42,12 +42,9 @@ public class User extends BaseEntity {
   @Column(name = "user_role", nullable = false)
   private UserRole userRole;
 
-  @Column(name = "verified", nullable = false)
-  private Boolean verified;
-
   @Builder
   public User(Long id, String email, String password, String name, String greeting, String profileImage,
-      UserRole userRole, Boolean verified) {
+      UserRole userRole) {
     this.id = id;
     this.email = email;
     this.password = password;
@@ -55,7 +52,6 @@ public class User extends BaseEntity {
     this.greeting = greeting;
     this.profileImage = profileImage;
     this.userRole = userRole;
-    this.verified = verified;
   }
 
   public void update(String name, String greeting, String profileImage) {
@@ -66,10 +62,6 @@ public class User extends BaseEntity {
 
   public void updatePassword(String password) {
     this.password = password;
-  }
-
-  public void updateVerified(Boolean verified) {
-    this.verified = verified;
   }
 
   public void updateProfileImage(String profileImage) {

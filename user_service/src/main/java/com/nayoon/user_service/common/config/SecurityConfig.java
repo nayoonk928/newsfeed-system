@@ -1,7 +1,5 @@
 package com.nayoon.user_service.common.config;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import com.nayoon.user_service.auth.filter.JwtAuthenticationFilter;
 import com.nayoon.user_service.auth.security.JwtAccessDeniedHandler;
 import com.nayoon.user_service.auth.security.JwtAuthenticationEntryPoint;
@@ -14,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -40,23 +37,23 @@ public class SecurityConfig {
             .frameOptions(FrameOptionsConfig::disable)
         )
         .httpBasic(AbstractHttpConfigurer::disable)
-        // URL 별 권한 관리 옵션
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(
-                antMatcher("/"),
-                antMatcher("/api/v1/users/signup"),
-                antMatcher("/api/v1/users/emails"),
-                antMatcher("/api/v1/users/emails/verifications"),
-                antMatcher("/api/v1/login"),
-                antMatcher("/api/v1/refreshToken")
-            ).permitAll()
-            .anyRequest().authenticated()
-        )
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .exceptionHandling(handle -> handle
-            .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-        .exceptionHandling(handle -> handle
-            .accessDeniedHandler(jwtAccessDeniedHandler))
+//        // URL 별 권한 관리 옵션
+//        .authorizeHttpRequests(authorize -> authorize
+//            .requestMatchers(
+//                antMatcher("/"),
+//                antMatcher("/api/v1/users/signup"),
+//                antMatcher("/api/v1/auth/emails"),
+//                antMatcher("/api/v1/users/emails/verifications"),
+//                antMatcher("/api/v1/login"),
+//                antMatcher("/api/v1/refreshToken")
+//            ).permitAll()
+//            .anyRequest().authenticated()
+//        )
+//        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//        .exceptionHandling(handle -> handle
+//            .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+//        .exceptionHandling(handle -> handle
+//            .accessDeniedHandler(jwtAccessDeniedHandler))
     ;
 
     return http.build();

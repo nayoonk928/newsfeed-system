@@ -3,26 +3,20 @@ package com.nayoon.user_service.user.service;
 import com.nayoon.user_service.auth.security.CustomUserDetails;
 import com.nayoon.user_service.common.exception.CustomException;
 import com.nayoon.user_service.common.exception.ErrorCode;
-import com.nayoon.user_service.common.mail.service.MailService;
 import com.nayoon.user_service.common.redis.service.RedisService;
 import com.nayoon.user_service.common.s3.service.S3Service;
 import com.nayoon.user_service.common.utils.EncryptionUtils;
 import com.nayoon.user_service.user.dto.request.PasswordUpdateRequest;
 import com.nayoon.user_service.user.dto.request.ProfileUpdateRequest;
 import com.nayoon.user_service.user.dto.request.SignUpRequest;
-import com.nayoon.user_service.user.dto.request.VerifyEmailRequest;
 import com.nayoon.user_service.user.dto.response.UserResponse;
+import com.nayoon.user_service.user.dto.response.UserSignUpResponse;
 import com.nayoon.user_service.user.entity.User;
 import com.nayoon.user_service.user.repository.UserRepository;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,20 +29,16 @@ public class UserService {
   private static final String AUTH_PREFIX = "AuthCode";
 
   private final UserRepository userRepository;
-  private final MailService mailService;
   private final RedisService redisService;
   private final S3Service s3Service;
 
   private final String IMAGE_PATH = "image/";
 
-  @Value("${spring.mail.auth-code-expiration-millis}")
-  private long authCodeExpirationMillis;
-
   /**
    * 회원가입 메서드
    */
   @Transactional
-  public String signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
+  public UserSignUpResponse signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
     if (imageFile.isEmpty()) {
       throw new CustomException(ErrorCode.PROFILE_IMAGE_REQUIRED);
     }
@@ -59,13 +49,15 @@ public class UserService {
     // 이메일 중복 확인
     checkDuplicatedEmail(request.email());
 
+    // 이메일 인증 코드 확인
+    verifyCode(request.email());
+
     User user = User.builder()
         .email(request.email())
         .name(request.name())
         .password(encryptPassword)
         .greeting(request.greeting())
         .userRole(request.userRole())
-        .verified(false)  // 아직 이메일 인증을 받지 않았기 때문에 verified = true
         .build();
 
     userRepository.save(user);
@@ -76,8 +68,7 @@ public class UserService {
     // s3에 올라간 이미지 URL 저장
     user.updateProfileImage(s3ImageUrl);
 
-    // 이메일로 인증 코드 전송
-    return sendCode(request.email());
+    return new UserSignUpResponse(user.getId(), user.getEmail());
   }
 
   // 이메일 중복 체크 메서드
@@ -89,54 +80,20 @@ public class UserService {
   }
 
   /**
-   * 이메일 인증 코드 전송하는 메서드
-   */
-  public String sendCode(String toEmail) {
-    String title = "Preorder 이메일 인증 번호";
-    String authCode = createCode();
-    mailService.sendEmail(toEmail, title, authCode);
-
-    // key = "AuthCode" + email, value = authCode 형식으로 Redis에 저장
-    redisService.setValues(AUTH_PREFIX + toEmail, authCode, authCodeExpirationMillis, TimeUnit.MILLISECONDS);
-    return authCode;
-  }
-
-  // 이메일 인증 코드 생성 메서드
-  private String createCode() {
-    int length = 6;
-    try {
-      Random random = SecureRandom.getInstanceStrong();
-      StringBuilder sb = new StringBuilder();
-
-      for (int i = 0; i < length; i++) {
-        sb.append(random.nextInt(10));
-      }
-
-      return sb.toString();
-    } catch (NoSuchAlgorithmException e) {
-      log.debug("UserService.createCode exception occur");
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
    * 이메일 인증 코드 유효성 확인 메서드
    */
   @Transactional
-  public void verifyCode(VerifyEmailRequest request) {
-    boolean authCodeExists = redisService.checkEmailAuthCode(AUTH_PREFIX + request.email(), request.code());
+  public void verifyCode(String email) {
+    String authCode = (String) redisService.getValue(AUTH_PREFIX + email);
 
-    if (authCodeExists) {
-      redisService.deleteKey(AUTH_PREFIX + request.email());
+    if (authCode == null) {
+      throw new CustomException(ErrorCode.AUTH_CODE_EXPIRED);
+    }
 
-      User user = userRepository.findByEmail(request.email())
-          .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-      if (user.getVerified()) {
-        throw new CustomException(ErrorCode.ALREADY_VERIFIED_USER);
-      }
-
-      user.updateVerified(true);
+    if (authCode.equals(email)) {
+      redisService.deleteKey(AUTH_PREFIX + email);
+    } else {
+      throw new CustomException(ErrorCode.EMAIL_AUTH_CODE_INCORRECT);
     }
   }
 

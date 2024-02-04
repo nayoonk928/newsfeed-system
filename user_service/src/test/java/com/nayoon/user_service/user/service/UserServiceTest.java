@@ -3,11 +3,8 @@ package com.nayoon.user_service.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,21 +12,18 @@ import static org.mockito.Mockito.when;
 import com.nayoon.user_service.auth.security.CustomUserDetails;
 import com.nayoon.user_service.common.exception.CustomException;
 import com.nayoon.user_service.common.exception.ErrorCode;
-import com.nayoon.user_service.common.mail.service.MailService;
 import com.nayoon.user_service.common.redis.service.RedisService;
 import com.nayoon.user_service.common.s3.service.S3Service;
 import com.nayoon.user_service.common.utils.EncryptionUtils;
 import com.nayoon.user_service.user.dto.request.PasswordUpdateRequest;
 import com.nayoon.user_service.user.dto.request.ProfileUpdateRequest;
 import com.nayoon.user_service.user.dto.request.SignUpRequest;
-import com.nayoon.user_service.user.dto.request.VerifyEmailRequest;
 import com.nayoon.user_service.user.dto.response.UserResponse;
 import com.nayoon.user_service.user.entity.User;
 import com.nayoon.user_service.user.repository.UserRepository;
 import com.nayoon.user_service.user.type.UserRole;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -53,9 +47,6 @@ class UserServiceTest {
 
   @Mock
   private UserRepository userRepository;
-
-  @Mock
-  private MailService mailService;
 
   @Mock
   private RedisService redisService;
@@ -109,99 +100,6 @@ class UserServiceTest {
 
       //then
       assertEquals(ErrorCode.ALREADY_EXISTS_EMAIL, exception.getErrorCode());
-    }
-
-  }
-
-  @Nested
-  @DisplayName("인증 코드 이메일 전송")
-  class SendCode {
-
-    @Test
-    @DisplayName("성공")
-    void success() {
-      //given
-      String email = "test@example.com";
-
-      //when
-      userService.sendCode(email);
-
-      //then
-      verify(mailService, times(1)).sendEmail(eq(email), anyString(), anyString());
-      verify(redisService, times(1)).setValues(anyString(), anyString(), anyLong(),
-          eq(TimeUnit.MILLISECONDS));
-    }
-
-  }
-
-  @Nested
-  @DisplayName("인증 코드 확인")
-  class VerifyCode {
-
-    @Test
-    @DisplayName("성공")
-    void success() {
-      //given
-      VerifyEmailRequest request = createVerifyEmailRequest();
-      when(redisService.checkEmailAuthCode(anyString(), anyString())).thenReturn(true);
-      when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(createUser(false)));
-
-      //when
-      userService.verifyCode(request);
-
-      //then
-      verify(redisService, times(1)).deleteKey(anyString());
-    }
-
-    @Test
-    @DisplayName("실패: 입력된 코드가 다름")
-    void invalidCode() {
-      //given
-      VerifyEmailRequest request = createVerifyEmailRequest();
-      when(redisService.checkEmailAuthCode(anyString(), anyString())).thenReturn(false);
-
-      //when
-      userService.verifyCode(request);
-
-      //then
-      verify(redisService, never()).deleteKey(anyString());
-      verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("실패: 사용자를 찾을 수 없음")
-    void userNotFound() {
-      //given
-      VerifyEmailRequest request = createVerifyEmailRequest();
-      when(redisService.checkEmailAuthCode(anyString(), anyString())).thenReturn(true);
-      when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
-
-      //when
-      CustomException exception = assertThrows(CustomException.class,
-          () -> userService.verifyCode(request));
-
-      //then
-      assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-      verify(redisService, times(1)).deleteKey(anyString());
-      verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("예외: 이미 인증된 사용자")
-    void alreadyVerifiedUser() {
-      //given
-      VerifyEmailRequest request = createVerifyEmailRequest();
-      when(redisService.checkEmailAuthCode(anyString(), anyString())).thenReturn(true);
-      when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(createUser(true)));
-
-      //when
-      CustomException exception = assertThrows(CustomException.class,
-          () -> userService.verifyCode(request));
-
-      //then
-      assertEquals(ErrorCode.ALREADY_VERIFIED_USER, exception.getErrorCode());
-      verify(redisService, times(1)).deleteKey(anyString());
-      verify(userRepository, never()).save(any(User.class));
     }
 
   }
@@ -305,13 +203,6 @@ class UserServiceTest {
         .password("password")
         .greeting("Hello, I'm a test user.")
         .userRole(UserRole.USER)
-        .build();
-  }
-
-  private VerifyEmailRequest createVerifyEmailRequest() {
-    return VerifyEmailRequest.builder()
-        .email("test@example.com")
-        .code("123456")
         .build();
   }
 
