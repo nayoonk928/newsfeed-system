@@ -74,8 +74,8 @@ class LoginServiceTest {
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
       when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-      when(jwtTokenProvider.generateAccessToken(user)).thenReturn(tokenDto.accessToken());
-      when(jwtTokenProvider.generateRefreshToken(user)).thenReturn(tokenDto.refreshToken());
+      when(jwtTokenProvider.generateAccessToken(user.getEmail())).thenReturn(tokenDto.accessToken());
+      when(jwtTokenProvider.generateRefreshToken(user.getEmail())).thenReturn(tokenDto.refreshToken());
       when(jwtTokenProvider.getExpiredTime(tokenDto.refreshToken())).thenReturn(
           tokenDto.refreshTokenExpiresTime());
 

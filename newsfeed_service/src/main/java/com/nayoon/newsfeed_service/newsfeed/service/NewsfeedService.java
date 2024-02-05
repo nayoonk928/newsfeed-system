@@ -6,11 +6,13 @@ import com.nayoon.newsfeed_service.newsfeed.entity.Newsfeed;
 import com.nayoon.newsfeed_service.newsfeed.repository.NewsfeedRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NewsfeedService {
@@ -38,6 +40,7 @@ public class NewsfeedService {
    * 나의 뉴스피드 조회
    */
   public Page<Newsfeed> myNewsfeed(Long principalId, Pageable pageable) {
+    log.info("Newsfeed 요청 사용자 ID: {}", principalId);
     // 팔로우한 모든 사람들의 아이디 조회
     List<Long> followingIds = activityClient.findFollowingIds(principalId).ids();
 

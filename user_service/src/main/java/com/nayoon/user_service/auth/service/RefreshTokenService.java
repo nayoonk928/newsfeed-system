@@ -29,7 +29,7 @@ public class RefreshTokenService {
     String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
     String email = jwtTokenProvider.getEmail(refreshToken);
 
-    String redisRefreshToken = (String) redisService.getValue("RT:" + email);
+    String redisRefreshToken = redisService.getValue("RT:" + email);
     if (!redisService.checkExistsValue(redisRefreshToken)) {
       throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
     }
@@ -41,7 +41,7 @@ public class RefreshTokenService {
           .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
       // accessToken 생성 및 반환
-      return jwtTokenProvider.generateAccessToken(user);
+      return jwtTokenProvider.generateAccessToken(user.getEmail());
     } else {
       throw new CustomException(ErrorCode.TOKEN_IS_NOT_SAME);
     }
