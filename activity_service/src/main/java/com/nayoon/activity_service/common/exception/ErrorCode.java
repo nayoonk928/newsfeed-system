@@ -7,6 +7,7 @@ public enum ErrorCode {
   // ------ 4xx ------
   NOT_FOUND(HttpStatus.BAD_REQUEST, "요청사항을 찾지 못했습니다."),
   INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+  MISSING_RELATED_USER_OR_ACTIVITY(HttpStatus.BAD_REQUEST, "관련 사용자나 활동이 없습니다."),
 
   // FOLLOW
   ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "이미 팔로우 중입니다."),

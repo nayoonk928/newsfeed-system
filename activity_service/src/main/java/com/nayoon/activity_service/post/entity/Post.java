@@ -26,17 +26,13 @@ public class Post extends BaseEntity {
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
-  @Column(name = "title", nullable = false)
-  private String title;
-
   @Column(name = "content", nullable = false)
   private String content;
 
   @Builder
-  public Post(Long id, Long userId, String title, String content) {
+  public Post(Long id, Long userId, String content) {
     this.id = id;
     this.userId = userId;
-    this.title = title;
     this.content = content;
   }
 

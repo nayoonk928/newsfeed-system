@@ -1,10 +1,13 @@
 package com.nayoon.activity_service.follow.service;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
+import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
 import com.nayoon.activity_service.follow.entity.Follow;
 import com.nayoon.activity_service.follow.repository.FollowRepository;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class FollowService {
 
   private final FollowRepository followRepository;
+  private final NewsfeedClient newsfeedClient;
+
   @Transactional
   public void follow(Long principalId, FollowRequest request) {
-    Long followerId = request.followerUserId();
+    Long followerId = principalId;
     Long followingId = request.followingUserId();
 
     if (Objects.equals(principalId, followingId)) {
@@ -34,15 +39,18 @@ public class FollowService {
 
     Follow saved = followRepository.save(follow);
 
-    // TODO: 뉴스피드에 팔로우 기록 추가
-//    NewsfeedCreateRequest newsfeedCreateRequest =
-//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(followerId, saved, ActivityType.FOLLOW);
-//
-//    newsfeedService.create(newsfeedCreateRequest);
+    NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
+        .actionUserId(followerId)
+        .relatedUserId(followingId)
+        .activityId(saved.getId())
+        .activityType("FOLLOW")
+        .build();
+
+    newsfeedClient.create(newsfeedCreateRequest);
   }
 
   private void relationshipExists(Long followerUserId, Long followingUserId) {
-    if (followRepository.existsByFollowerIdAndFollowingId(followerUserId, followingUserId)){
+    if (followRepository.existsByFollowerIdAndFollowingId(followerUserId, followingUserId)) {
       throw new CustomException(ErrorCode.ALREADY_FOLLOWING);
     }
   }
@@ -51,6 +59,18 @@ public class FollowService {
     if (!principalId.equals(followerId)) {
       throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
     }
+  }
+
+  public List<Long> findByFollowingId(Long principalId) {
+    return followRepository.findFollowing(principalId).stream()
+        .map(Follow::getFollowingId)
+        .toList();
+  }
+
+  public List<Long> findByFollowerId(Long principalId) {
+    return followRepository.findFollower(principalId).stream()
+        .map(Follow::getFollowerId)
+        .toList();
   }
 
 }

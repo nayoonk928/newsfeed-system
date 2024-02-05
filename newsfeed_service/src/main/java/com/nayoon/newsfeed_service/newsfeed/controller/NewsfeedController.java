@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +26,7 @@ public class NewsfeedController {
    */
   @GetMapping
   public ResponseEntity<Page<NewsfeedResponse>> myNewsfeed(
-      @RequestParam(name = "user", required = false) Long principalId,
+      @RequestHeader("X-USER-ID") String userId,
       @RequestParam(value = "orderBy", defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "sortBy", defaultValue = "desc") String sortBy,
       @RequestParam(value = "pageCount", defaultValue = "20") int size,
@@ -35,6 +36,7 @@ public class NewsfeedController {
     Sort sort = Sort.by(direction, orderBy);
     Pageable pageable = PageRequest.of(page, size, sort);
 
+    Long principalId = Long.valueOf(userId);
     Page<NewsfeedResponse> newsfeeds = newsfeedService.myNewsfeed(principalId, pageable)
         .map(NewsfeedResponse::from);
     return ResponseEntity.ok().body(newsfeeds);

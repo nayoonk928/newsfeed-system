@@ -56,7 +56,7 @@ class RefreshTokenServiceTest {
       when(redisService.getValue("RT:" + email)).thenReturn(refreshToken);
       when(redisService.checkExistsValue(refreshToken)).thenReturn(true);
       when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-      when(jwtTokenProvider.generateAccessToken(user)).thenReturn("accessToken");
+      when(jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId())).thenReturn("accessToken");
 
       //when
       String accessToken = refreshTokenService.refresh(request);

@@ -68,14 +68,14 @@ class LoginServiceTest {
     @DisplayName("성공")
     void success() {
       //given
-      User user = createUser(true);
+      User user = createUser();
       LoginRequest request = createLoginRequest();
       TokenDto tokenDto = createTokenDto();
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
       when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-      when(jwtTokenProvider.generateAccessToken(user)).thenReturn(tokenDto.accessToken());
-      when(jwtTokenProvider.generateRefreshToken(user)).thenReturn(tokenDto.refreshToken());
+      when(jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId())).thenReturn(tokenDto.accessToken());
+      when(jwtTokenProvider.generateRefreshToken(user.getEmail(), user.getId())).thenReturn(tokenDto.refreshToken());
       when(jwtTokenProvider.getExpiredTime(tokenDto.refreshToken())).thenReturn(
           tokenDto.refreshTokenExpiresTime());
 
@@ -109,7 +109,7 @@ class LoginServiceTest {
     @DisplayName("실패: 비밀번호 다름")
     void invalidPassword() {
       //given
-      User user = createUser(true);
+      User user = createUser();
       LoginRequest request = createInvalidLoginRequest();
 
       when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
@@ -123,24 +123,6 @@ class LoginServiceTest {
       assertEquals(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD, exception.getErrorCode());
     }
 
-    @Test
-    @DisplayName("실패: 이메일 인증 하지 않음")
-    void notVerifiedEmail() {
-      //given
-      User user = createUser(false);
-      LoginRequest request = createInvalidLoginRequest();
-
-      when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
-      when(EncryptionUtils.matchPassword(request.password(), user.getPassword())).thenReturn(true);
-
-      //when
-      CustomException exception = assertThrows(CustomException.class,
-          () -> loginService.login(request));
-
-      //then
-      assertEquals(ErrorCode.MUST_VERIFIED_EMAIL, exception.getErrorCode());
-    }
-
   }
 
   private LoginRequest createLoginRequest() {
@@ -151,14 +133,13 @@ class LoginServiceTest {
     return new LoginRequest("test@example.com", "passwor");
   }
 
-  private User createUser(boolean verified) {
+  private User createUser() {
     return User.builder()
         .email("test@example.com")
         .name("Test User")
         .password("password")
         .greeting("Hello, I'm a test user.")
         .userRole(UserRole.USER)
-        .verified(verified)
         .build();
   }
 

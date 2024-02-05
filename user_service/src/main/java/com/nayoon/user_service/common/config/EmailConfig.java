@@ -1,4 +1,4 @@
-package com.nayoon.user_service.common.mail.config;
+package com.nayoon.user_service.common.config;
 
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;

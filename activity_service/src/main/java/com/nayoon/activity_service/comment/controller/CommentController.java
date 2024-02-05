@@ -2,6 +2,7 @@ package com.nayoon.activity_service.comment.controller;
 
 import com.nayoon.activity_service.comment.dto.request.CommentCreateRequest;
 import com.nayoon.activity_service.comment.service.CommentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,9 +25,10 @@ public class CommentController {
    */
   @PostMapping
   public ResponseEntity<Void> createComment(
-      @RequestParam(name = "user", required = false) Long principalId,
+      HttpServletRequest httpRequest,
       @Valid @RequestBody CommentCreateRequest request
   ) {
+    Long principalId = Long.valueOf(httpRequest.getHeader("X-USER-ID"));
     Long commentId = commentService.createComment(principalId, request);
     return ResponseEntity.created(URI.create("api/v1/comments/" + commentId)).build();
   }
@@ -37,9 +38,10 @@ public class CommentController {
    */
   @PostMapping("/{id}/like")
   public ResponseEntity<Void> likeComment(
-      @RequestParam(name = "user", required = false) Long principalId,
+      HttpServletRequest httpRequest,
       @PathVariable("id") Long commentId
   ) {
+    Long principalId = Long.valueOf(httpRequest.getHeader("X-USER-ID"));
     commentService.likeComment(principalId, commentId);
     return ResponseEntity.ok().build();
   }

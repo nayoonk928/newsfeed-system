@@ -36,10 +36,6 @@ public class CustomUserDetails implements UserDetails {
     return user.getProfileImage();
   }
 
-  public boolean getVerified() {
-    return user.getVerified();
-  }
-
   @Override
   public String getPassword() {
     return user.getPassword();

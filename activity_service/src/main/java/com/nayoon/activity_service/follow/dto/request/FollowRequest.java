@@ -1,11 +1,9 @@
 package com.nayoon.activity_service.follow.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record FollowRequest(
-    @NotBlank
-    Long followerUserId,
-    @NotBlank
+    @NotNull
     Long followingUserId
 ) {
 

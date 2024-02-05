@@ -26,19 +26,18 @@ public class LoginService {
    * 사용자 로그인 메서드
    */
   public TokenDto login(LoginRequest request) {
-    User user = userRepository.findByEmail(request.email())
+    String email = request.email();
+    String password = request.password();
+
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD));
 
-    if (!EncryptionUtils.matchPassword(request.password(), user.getPassword())) {
+    if (!EncryptionUtils.matchPassword(password, user.getPassword())) {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    if (!user.getVerified()) {
-      throw new CustomException(ErrorCode.MUST_VERIFIED_EMAIL);
-    }
-
-    String accessToken = jwtTokenProvider.generateAccessToken(user);
-    String refreshToken = jwtTokenProvider.generateRefreshToken(user);
+    String accessToken = jwtTokenProvider.generateAccessToken(email, user.getId());
+    String refreshToken = jwtTokenProvider.generateRefreshToken(email, user.getId());
 
     Long expiresTime = jwtTokenProvider.getExpiredTime(refreshToken);
     redisService.setValues("RT:" + user.getEmail(), refreshToken, expiresTime, TimeUnit.MILLISECONDS);

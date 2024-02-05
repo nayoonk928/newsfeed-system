@@ -1,5 +1,7 @@
 package com.nayoon.activity_service.post.service;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
+import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.post.dto.request.PostCreateRequest;
@@ -17,25 +19,28 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
+  private final NewsfeedClient newsfeedClient;
 
   /**
    *  게시글 생성 메서드
    */
   @Transactional
-  public Long createPost(Long userId, PostCreateRequest request) {
+  public Long create(Long principalId, PostCreateRequest request) {
     Post post = Post.builder()
-        .userId(userId)
-        .title(request.title())
+        .userId(principalId)
         .content(request.content())
         .build();
 
     Post saved = postRepository.save(post);
 
-    // TODO: 게시글 활동 뉴스피드에 등록
-//    NewsfeedCreateRequest newsfeedCreateRequest =
-//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST);
-//
-//    newsfeedService.create(newsfeedCreateRequest);
+    NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
+        .actionUserId(principalId)
+        .relatedUserId(post.getUserId())
+        .activityId(saved.getId())
+        .activityType("POST")
+        .build();
+
+    newsfeedClient.create(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -44,27 +49,29 @@ public class PostService {
    * 게시글 좋아요 메서드
    */
   @Transactional
-  public void likePost(Long userId, Long postId) {
-
+  public void like(Long principalId, Long postId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-    if (postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
+    if (postLikeRepository.existsByPostIdAndUserId(postId, principalId)) {
       throw new CustomException(ErrorCode.ALREADY_LIKED_POST);
     }
 
     PostLike postLike = PostLike.builder()
         .post(post)
-        .userId(userId)
+        .userId(principalId)
         .build();
 
     PostLike saved = postLikeRepository.save(postLike);
 
-    // TODO: 게시글 좋아요 활동 뉴스피드에 등록
-//    NewsfeedCreateRequest newsfeedCreateRequest =
-//        NewsfeedCreateRequest.buildNewsfeedCreateRequest(userId, saved, ActivityType.POST_LIKE);
-//
-//    newsfeedService.create(newsfeedCreateRequest);
+    NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
+        .actionUserId(principalId)
+        .relatedUserId(post.getUserId())
+        .activityId(saved.getId())
+        .activityType("POST_LIKE")
+        .build();
+
+    newsfeedClient.create(newsfeedCreateRequest);
   }
 
 }
