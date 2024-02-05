@@ -36,8 +36,8 @@ public class LoginService {
       throw new CustomException(ErrorCode.INCORRECT_EMAIL_OR_PASSWORD);
     }
 
-    String accessToken = jwtTokenProvider.generateAccessToken(email);
-    String refreshToken = jwtTokenProvider.generateRefreshToken(email);
+    String accessToken = jwtTokenProvider.generateAccessToken(email, user.getId());
+    String refreshToken = jwtTokenProvider.generateRefreshToken(email, user.getId());
 
     Long expiresTime = jwtTokenProvider.getExpiredTime(refreshToken);
     redisService.setValues("RT:" + user.getEmail(), refreshToken, expiresTime, TimeUnit.MILLISECONDS);

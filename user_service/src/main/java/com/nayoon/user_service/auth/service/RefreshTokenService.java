@@ -41,7 +41,7 @@ public class RefreshTokenService {
           .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
       // accessToken 생성 및 반환
-      return jwtTokenProvider.generateAccessToken(user.getEmail());
+      return jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId());
     } else {
       throw new CustomException(ErrorCode.TOKEN_IS_NOT_SAME);
     }

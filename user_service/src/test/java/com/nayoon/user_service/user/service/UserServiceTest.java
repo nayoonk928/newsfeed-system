@@ -125,7 +125,7 @@ class UserServiceTest {
           Optional.of(createUser(true)));
 
       //when
-      UserResponse result = userService.updateProfile(userDetails, updateRequest, imageFile);
+      UserResponse result = userService.updateProfile(userDetails.getId(), updateRequest, imageFile);
 
       //then
       verify(userRepository, times(1)).findById(eq(userDetails.getId()));
@@ -147,7 +147,7 @@ class UserServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class,
-          () -> userService.updateProfile(userDetails, updateRequest, imageFile));
+          () -> userService.updateProfile(userDetails.getId(), updateRequest, imageFile));
 
       //then
       assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
@@ -174,7 +174,7 @@ class UserServiceTest {
           false);
 
       //when
-      userService.updatePassword(userDetails, request);
+      userService.updatePassword(userDetails.getId(), request);
 
       //then
       verify(userRepository, times(1)).findById(eq(userDetails.getId()));
@@ -193,7 +193,7 @@ class UserServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class,
-          () -> userService.updatePassword(userDetails, request));
+          () -> userService.updatePassword(userDetails.getId(), request));
 
       //then
       assertEquals(ErrorCode.NOT_MATCHED_CURR_PASSWORD, exception.getErrorCode());

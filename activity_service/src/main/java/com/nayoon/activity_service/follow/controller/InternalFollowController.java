@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/internal/activities")
+@RequestMapping("/api/v1/internal")
 public class InternalFollowController {
 
   private final FollowService followService;
@@ -21,7 +21,7 @@ public class InternalFollowController {
    */
   @GetMapping("/follows")
   public ResponseEntity<List<Long>> findFollowing(
-      @RequestParam(name = "user") Long principalId
+      @RequestParam(name = "userId") Long principalId
   ) {
     return ResponseEntity.ok().body(followService.findByFollowingId(principalId));
   }
@@ -31,7 +31,7 @@ public class InternalFollowController {
    */
   @GetMapping("/followers")
   public ResponseEntity<List<Long>> findFollowers(
-      @RequestParam(name = "user") Long principalId
+      @RequestParam(name = "userId") Long principalId
   ) {
     return ResponseEntity.ok().body(followService.findByFollowerId(principalId));
   }

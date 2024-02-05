@@ -22,7 +22,7 @@ public class FollowService {
 
   @Transactional
   public void follow(Long principalId, FollowRequest request) {
-    Long followerId = request.followerUserId();
+    Long followerId = principalId;
     Long followingId = request.followingUserId();
 
     if (Objects.equals(principalId, followingId)) {
@@ -43,7 +43,7 @@ public class FollowService {
         .actionUserId(followerId)
         .relatedUserId(followingId)
         .activityId(saved.getId())
-        .activityType("follow")
+        .activityType("FOLLOW")
         .build();
 
     newsfeedClient.create(newsfeedCreateRequest);

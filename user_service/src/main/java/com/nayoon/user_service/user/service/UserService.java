@@ -1,6 +1,5 @@
 package com.nayoon.user_service.user.service;
 
-import com.nayoon.user_service.auth.security.CustomUserDetails;
 import com.nayoon.user_service.common.exception.CustomException;
 import com.nayoon.user_service.common.exception.ErrorCode;
 import com.nayoon.user_service.common.redis.service.RedisService;
@@ -101,9 +100,9 @@ public class UserService {
    * 사용자 정보 업데이트 (이름, 프로필 이미지, 인사말)
    */
   @Transactional
-  public UserResponse updateProfile(CustomUserDetails userDetails, ProfileUpdateRequest request,
+  public UserResponse updateProfile(Long principalId, ProfileUpdateRequest request,
       MultipartFile imageFile) throws IOException {
-    User user = userRepository.findById(userDetails.getId())
+    User user = userRepository.findById(principalId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     String imageUrl = getImageUrl(user, user.getProfileImage(), imageFile);
@@ -135,8 +134,8 @@ public class UserService {
    * 비밀번호 업데이트
    */
   @Transactional
-  public void updatePassword(CustomUserDetails userDetails, PasswordUpdateRequest request) {
-    User user = userRepository.findById(userDetails.getId())
+  public void updatePassword(Long principalId, PasswordUpdateRequest request) {
+    User user = userRepository.findById(principalId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     String encryptedPassword = EncryptionUtils.encode(request.newPassword());

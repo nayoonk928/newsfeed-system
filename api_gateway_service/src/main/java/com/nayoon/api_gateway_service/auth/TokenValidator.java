@@ -29,6 +29,13 @@ public class TokenValidator {
   }
 
   /**
+   * 토큰에서 아이디 추출하는 메서드
+   */
+  public static String getUserId(String token) {
+    return parseClaims(token).getSubject();
+  }
+
+  /**
    * 토큰이 유효한지 확인하는 메서드
    */
   public static boolean validateToken(String token) {

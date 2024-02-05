@@ -1,15 +1,8 @@
 package com.nayoon.user_service.common.config;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import com.nayoon.user_service.auth.filter.JwtAuthenticationFilter;
-import com.nayoon.user_service.auth.filter.JwtAuthorizationFilter;
-import com.nayoon.user_service.auth.security.CustomUserDetailsService;
-import com.nayoon.user_service.auth.security.JwtAccessDeniedHandler;
-import com.nayoon.user_service.auth.security.JwtAuthenticationEntryPoint;
 import com.nayoon.user_service.auth.service.JwtTokenProvider;
 import com.nayoon.user_service.auth.service.LoginService;
-import com.nayoon.user_service.common.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,11 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final AuthenticationConfiguration authenticationConfiguration;
-  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-  private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-  private final CustomUserDetailsService customUserDetailsService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final RedisService redisService;
   private final LoginService loginService;
 
   @Bean
@@ -54,11 +43,6 @@ public class SecurityConfig {
   }
 
   @Bean
-  public JwtAuthorizationFilter jwtAuthorizationFilter() {
-    return new JwtAuthorizationFilter(jwtTokenProvider, customUserDetailsService, redisService);
-  }
-
-  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable) // csrf 보안 사용 X
@@ -68,24 +52,7 @@ public class SecurityConfig {
             .frameOptions(FrameOptionsConfig::disable)
         )
         .httpBasic(AbstractHttpConfigurer::disable)
-        // URL 별 권한 관리 옵션
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(
-                antMatcher("/"),
-                antMatcher("/api/v1/users/signup"),
-                antMatcher("/api/v1/auth/emails"),
-                antMatcher("/api/v1/users/emails/verifications"),
-                antMatcher("/api/v1/login"),
-                antMatcher("/api/v1/refreshToken")
-            ).permitAll()
-            .anyRequest().authenticated()
-        )
-        .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
         .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-        .exceptionHandling(handle -> handle
-            .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-        .exceptionHandling(handle -> handle
-            .accessDeniedHandler(jwtAccessDeniedHandler))
     ;
 
     return http.build();

@@ -4,6 +4,7 @@ import com.nayoon.newsfeed_service.client.ActivityClient;
 import com.nayoon.newsfeed_service.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.newsfeed_service.newsfeed.entity.Newsfeed;
 import com.nayoon.newsfeed_service.newsfeed.repository.NewsfeedRepository;
+import com.nayoon.newsfeed_service.newsfeed.type.ActivityType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class NewsfeedService {
         .actionUserId(request.actionUserId())
         .relatedUserId(request.relatedUserId())
         .activityId(request.activityId())
-        .activityType(request.activityType())
+        .activityType(ActivityType.create(request.activityType()))
         .createdAt(request.createdAt())
         .build();
 
@@ -42,7 +43,7 @@ public class NewsfeedService {
   public Page<Newsfeed> myNewsfeed(Long principalId, Pageable pageable) {
     log.info("Newsfeed 요청 사용자 ID: {}", principalId);
     // 팔로우한 모든 사람들의 아이디 조회
-    List<Long> followingIds = activityClient.findFollowingIds(principalId).ids();
+    List<Long> followingIds = activityClient.findFollowingIds(principalId);
 
     return newsfeedRepository.filterNewsfeeds(principalId, followingIds, pageable);
   }

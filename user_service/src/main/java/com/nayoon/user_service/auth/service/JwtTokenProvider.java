@@ -55,37 +55,29 @@ public class JwtTokenProvider {
   /**
    * AccessToken 생성 메서드
    */
-  public String generateAccessToken(String email) {
+  public String generateAccessToken(String email, Long userId) {
     Date now = new Date();
-
-    // 토큰 생성
-    String accessToken = Jwts.builder()
-        .setSubject(email)
-        .claim("email", email)
-        .setIssuedAt(now)
-        .setExpiration(new Date(now.getTime() + accessTokenValidationTime))
-        .signWith(key, SignatureAlgorithm.HS256)
-        .compact();
-
-    return accessToken;
+    return createToken(now, email, userId, accessTokenValidationTime);
   }
 
   /**
    * RefreshToken 생성 메서드
    */
-  public String generateRefreshToken(String email) {
+  public String generateRefreshToken(String email, Long userId) {
     Date now = new Date();
+    return createToken(now, email, userId, refreshTokenValidationTime);
+  }
 
-    // 토큰 생성
-    String refreshToken = Jwts.builder()
-        .setSubject(email)
+  private String createToken(Date now, String email, Long userId, long validationTime) {
+    String token = Jwts.builder()
+        .setSubject(String.valueOf(userId))
         .claim("email", email)
         .setIssuedAt(now)
-        .setExpiration(new Date(now.getTime() + refreshTokenValidationTime))
+        .setExpiration(new Date(now.getTime() + validationTime))
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
 
-    return refreshToken;
+    return token;
   }
 
   /**
@@ -105,7 +97,7 @@ public class JwtTokenProvider {
       throw new CustomException(ErrorCode.INVALID_AUTHENTICATION_TOKEN);
     }
 
-    return parseClaims(token).getSubject();
+    return parseClaims(token).get("email").toString();
   }
 
   /**
