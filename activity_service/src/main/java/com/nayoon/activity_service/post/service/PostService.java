@@ -59,6 +59,7 @@ public class PostService {
 
     PostLike postLike = PostLike.builder()
         .post(post)
+        .liked(true)
         .userId(principalId)
         .build();
 
@@ -68,7 +69,7 @@ public class PostService {
         .actionUserId(principalId)
         .relatedUserId(post.getUserId())
         .activityId(saved.getId())
-        .activityType("POST_LIKE")
+        .activityType("POSTLIKE")
         .build();
 
     newsfeedClient.create(newsfeedCreateRequest);

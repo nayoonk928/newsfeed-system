@@ -39,3 +39,4 @@ out/
 /postgres/
 /.env
 /src/main/generated/
+/db/

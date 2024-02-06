@@ -69,6 +69,7 @@ public class CommentService {
     CommentLike commentLike = CommentLike.builder()
         .comment(comment)
         .userId(principalId)
+        .liked(true)
         .build();
 
     CommentLike saved = commentLikeRepository.save(commentLike);
@@ -77,7 +78,7 @@ public class CommentService {
         .actionUserId(principalId)
         .relatedUserId(comment.getUserId())
         .activityId(saved.getId())
-        .activityType("COMMENT_LIKE")
+        .activityType("COMMENTLIKE")
         .build();
 
     newsfeedClient.create(newsfeedCreateRequest);

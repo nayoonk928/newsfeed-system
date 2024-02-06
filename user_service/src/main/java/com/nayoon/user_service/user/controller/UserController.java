@@ -50,7 +50,8 @@ public class UserController {
       @RequestPart(name = "profileImage", required = false) MultipartFile imageFile
   ) throws IOException {
     log.info("User profile update Start");
-    return ResponseEntity.ok().body(userService.updateProfile(Long.valueOf(principalId), request, imageFile));
+    return ResponseEntity.ok().body(
+        userService.updateProfile(Long.valueOf(principalId), request, imageFile));
   }
 
   /**
