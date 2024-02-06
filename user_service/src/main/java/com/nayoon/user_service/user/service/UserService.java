@@ -37,7 +37,8 @@ public class UserService {
    * 회원가입 메서드
    */
   @Transactional
-  public UserSignUpResponse signup(SignUpRequest request, MultipartFile imageFile) throws IOException {
+  public UserSignUpResponse signup(SignUpRequest request, MultipartFile imageFile)
+      throws IOException {
     if (imageFile.isEmpty()) {
       throw new CustomException(ErrorCode.PROFILE_IMAGE_REQUIRED);
     }

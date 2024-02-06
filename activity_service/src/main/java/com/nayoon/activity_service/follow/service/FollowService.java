@@ -2,6 +2,7 @@ package com.nayoon.activity_service.follow.service;
 
 import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.client.NewsfeedCreateRequest;
+import com.nayoon.activity_service.client.UserClient;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
@@ -19,17 +20,20 @@ public class FollowService {
 
   private final FollowRepository followRepository;
   private final NewsfeedClient newsfeedClient;
+  private final UserClient userClient;
 
   @Transactional
   public void follow(Long principalId, FollowRequest request) {
-    Long followerId = principalId;
     Long followingId = request.followingUserId();
 
     if (Objects.equals(principalId, followingId)) {
       throw new CustomException(ErrorCode.CANNOT_FOLLOW_SELF);
     }
 
-    checkAuthorized(principalId, followerId);
+    if (!userClient.checkUserExists(principalId)) {
+      throw new CustomException(ErrorCode.INVALID_REQUEST);
+    }
+
     relationshipExists(principalId, followingId);
 
     Follow follow = Follow.builder()
@@ -40,7 +44,7 @@ public class FollowService {
     Follow saved = followRepository.save(follow);
 
     NewsfeedCreateRequest newsfeedCreateRequest = NewsfeedCreateRequest.builder()
-        .actionUserId(followerId)
+        .actionUserId(principalId)
         .relatedUserId(followingId)
         .activityId(saved.getId())
         .activityType("FOLLOW")
@@ -52,12 +56,6 @@ public class FollowService {
   private void relationshipExists(Long followerUserId, Long followingUserId) {
     if (followRepository.existsByFollowerIdAndFollowingId(followerUserId, followingUserId)) {
       throw new CustomException(ErrorCode.ALREADY_FOLLOWING);
-    }
-  }
-
-  private void checkAuthorized(Long principalId, Long followerId) {
-    if (!principalId.equals(followerId)) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
     }
   }
 

@@ -20,6 +20,10 @@ public class LogoutService {
   public void logout(HttpServletRequest request) {
     String accessToken = jwtTokenProvider.resolveAccessToken(request);
 
+    if (redisService.keyExists(accessToken)) {
+      throw new CustomException(ErrorCode.ALREADY_LOGOUT);
+    }
+
     if (!jwtTokenProvider.validateToken(accessToken)) {
       throw new CustomException(ErrorCode.INVALID_AUTHENTICATION_TOKEN);
     }
