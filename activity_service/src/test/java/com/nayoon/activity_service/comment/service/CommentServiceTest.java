@@ -68,7 +68,7 @@ class CommentServiceTest {
       });
 
       //when
-      Long commentId = commentService.createComment(userId, request);
+      Long commentId = commentService.create(userId, request);
 
       //then
       assertNotNull(commentId);
@@ -88,7 +88,7 @@ class CommentServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class,
-          () -> commentService.createComment(userId, request));
+          () -> commentService.create(userId, request));
 
       //then
       assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
@@ -116,7 +116,7 @@ class CommentServiceTest {
       });
 
       //when
-      commentService.likeComment(userId, comment.getId());
+      commentService.like(userId, comment.getId());
 
       //then
       verify(commentLikeRepository, times(1)).save(any(CommentLike.class));
@@ -133,7 +133,7 @@ class CommentServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> commentService.likeComment(userId, comment.getId()));
+          -> commentService.like(userId, comment.getId()));
 
       //then
       assertEquals(ErrorCode.COMMENT_NOT_FOUND, exception.getErrorCode());
@@ -151,7 +151,7 @@ class CommentServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> commentService.likeComment(userId, comment.getId()));
+          -> commentService.like(userId, comment.getId()));
 
       //then
       assertEquals(ErrorCode.ALREADY_LIKED_COMMENT, exception.getErrorCode());

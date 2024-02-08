@@ -1,4 +1,4 @@
-package com.nayoon.activity_service.config;
+package com.nayoon.newsfeed_service.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
@@ -27,7 +27,7 @@ public class Resilience4JConfig {
         .slidingWindowSize(6)
         .build();
 
-    return circuitBreakerRegistry.circuitBreaker("activityService", circuitBreakerConfig);
+    return circuitBreakerRegistry.circuitBreaker("newsfeedService", circuitBreakerConfig);
   }
 
   @Bean

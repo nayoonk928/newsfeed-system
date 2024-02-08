@@ -1,5 +1,6 @@
 package com.nayoon.activity_service.follow.service;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.client.UserClient;
 import com.nayoon.activity_service.common.exception.CustomException;
@@ -7,22 +8,28 @@ import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
 import com.nayoon.activity_service.follow.entity.Follow;
 import com.nayoon.activity_service.follow.repository.FollowRepository;
-import com.nayoon.activity_service.resilience_test.CircuitRetryService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FollowService {
 
   private final FollowRepository followRepository;
   private final UserClient userClient;
-  private final CircuitRetryService circuitRetryService;
+  private final NewsfeedClient newsfeedClient;
 
   @Transactional
+  @CircuitBreaker(name = "activityService", fallbackMethod = "fallback")
+  @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
   public void follow(Long principalId, FollowRequest request) {
     Long followingId = request.followingUserId();
 
@@ -50,7 +57,11 @@ public class FollowService {
         .activityType("FOLLOW")
         .build();
 
-    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
+    newsfeedClient.create(newsfeedCreateRequest);
+  }
+
+  private void fallback(Exception ex) {
+    log.error("Fallback Method is Running: ", ex);
   }
 
   private void relationshipExists(Long followerUserId, Long followingUserId) {
