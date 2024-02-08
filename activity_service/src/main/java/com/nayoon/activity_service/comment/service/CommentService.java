@@ -1,6 +1,5 @@
 package com.nayoon.activity_service.comment.service;
 
-import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.comment.dto.request.CommentCreateRequest;
 import com.nayoon.activity_service.comment.entity.Comment;
@@ -11,6 +10,7 @@ import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.post.entity.Post;
 import com.nayoon.activity_service.post.repository.PostRepository;
+import com.nayoon.activity_service.resilience_test.CircuitRetryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final CommentLikeRepository commentLikeRepository;
-  private final NewsfeedClient newsfeedClient;
+  private final CircuitRetryService circuitRetryService;
 
   /**
    *  댓글 생성 메서드
@@ -48,7 +48,7 @@ public class CommentService {
         .activityType("COMMENT")
         .build();
 
-    newsfeedClient.create(newsfeedCreateRequest);
+    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -81,7 +81,7 @@ public class CommentService {
         .activityType("COMMENTLIKE")
         .build();
 
-    newsfeedClient.create(newsfeedCreateRequest);
+    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
   }
 
 }

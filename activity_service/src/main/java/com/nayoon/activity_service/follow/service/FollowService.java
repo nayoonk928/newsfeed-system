@@ -1,6 +1,5 @@
 package com.nayoon.activity_service.follow.service;
 
-import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.client.UserClient;
 import com.nayoon.activity_service.common.exception.CustomException;
@@ -8,6 +7,7 @@ import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
 import com.nayoon.activity_service.follow.entity.Follow;
 import com.nayoon.activity_service.follow.repository.FollowRepository;
+import com.nayoon.activity_service.resilience_test.CircuitRetryService;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class FollowService {
 
   private final FollowRepository followRepository;
-  private final NewsfeedClient newsfeedClient;
   private final UserClient userClient;
+  private final CircuitRetryService circuitRetryService;
 
   @Transactional
   public void follow(Long principalId, FollowRequest request) {
@@ -50,7 +50,7 @@ public class FollowService {
         .activityType("FOLLOW")
         .build();
 
-    newsfeedClient.create(newsfeedCreateRequest);
+    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
   }
 
   private void relationshipExists(Long followerUserId, Long followingUserId) {

@@ -1,6 +1,5 @@
 package com.nayoon.activity_service.post.service;
 
-import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.client.NewsfeedCreateRequest;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
@@ -9,6 +8,7 @@ import com.nayoon.activity_service.post.entity.Post;
 import com.nayoon.activity_service.post.entity.PostLike;
 import com.nayoon.activity_service.post.repository.PostLikeRepository;
 import com.nayoon.activity_service.post.repository.PostRepository;
+import com.nayoon.activity_service.resilience_test.CircuitRetryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
-  private final NewsfeedClient newsfeedClient;
+  private final CircuitRetryService circuitRetryService;
 
   /**
    *  게시글 생성 메서드
@@ -40,7 +40,7 @@ public class PostService {
         .activityType("POST")
         .build();
 
-    newsfeedClient.create(newsfeedCreateRequest);
+    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
 
     return saved.getId();
   }
@@ -72,7 +72,7 @@ public class PostService {
         .activityType("POSTLIKE")
         .build();
 
-    newsfeedClient.create(newsfeedCreateRequest);
+    circuitRetryService.sendNewsfeedRequest(newsfeedCreateRequest);
   }
 
 }
