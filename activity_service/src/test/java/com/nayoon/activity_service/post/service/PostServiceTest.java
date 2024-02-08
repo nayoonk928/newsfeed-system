@@ -1,6 +1,7 @@
 package com.nayoon.activity_service.post.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -9,8 +10,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
+import com.nayoon.activity_service.post.dto.request.PostCreateRequest;
 import com.nayoon.activity_service.post.entity.Post;
 import com.nayoon.activity_service.post.entity.PostLike;
 import com.nayoon.activity_service.post.repository.PostLikeRepository;
@@ -36,23 +39,8 @@ class PostServiceTest {
   @Mock
   private PostLikeRepository postLikeRepository;
 
-//  @Mock
-//  private NewsfeedService newsfeedService;
-//
-//  @Mock
-//  private NewsfeedRepository newsfeedRepository;
-//
-//  private static MockedStatic<NewsfeedCreateRequest> mNewsfeedCreateRequest;
-//
-//  @BeforeAll
-//  static void beforeClass() {
-//    mNewsfeedCreateRequest = mockStatic(NewsfeedCreateRequest.class);
-//  }
-//
-//  @AfterAll
-//  static void afterClass() {
-//    mNewsfeedCreateRequest.close();
-//  }
+  @Mock
+  private NewsfeedClient newsfeedClient;
 
   @Nested
   @DisplayName("게시글 생성")
@@ -62,20 +50,20 @@ class PostServiceTest {
     @DisplayName("성공")
     void success() {
       //given
-//      Long userId = 1L;
-//      PostCreateRequest request = new PostCreateRequest("title", "content");
-//
-//      when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
-//        return Post.builder().id(123L).title(request.title()).content(request.content()).build();
-//      });
-//
-//      //when
-//      Long postId = postService.createPost(userId, request);
-//
-//      //then
-//      assertNotNull(postId);
-//      assertEquals(123L, postId);  // ID가 Mocked로 설정되었는지 확인
-//      verify(postRepository, times(1)).save(any(Post.class));
+      Long userId = 1L;
+      PostCreateRequest request = new PostCreateRequest("content");
+
+      when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
+        return Post.builder().id(123L).content(request.content()).build();
+      });
+
+      //when
+      Long postId = postService.create(userId, request);
+
+      //then
+      assertNotNull(postId);
+      assertEquals(123L, postId);  // ID가 Mocked로 설정되었는지 확인
+      verify(postRepository, times(1)).save(any(Post.class));
     }
 
   }
@@ -93,9 +81,12 @@ class PostServiceTest {
 
       when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
       when(postLikeRepository.existsByPostIdAndUserId(post.getId(), userId)).thenReturn(false);
+      when(postLikeRepository.save(any(PostLike.class))).thenAnswer(invocation -> {
+        return PostLike.builder().id(123L).build();
+      });
 
       //when
-      postService.likePost(userId, post.getId());
+      postService.like(userId, post.getId());
 
       //then
       verify(postLikeRepository, times(1)).save(any(PostLike.class));
@@ -112,7 +103,7 @@ class PostServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> postService.likePost(userId, post.getId()));
+          -> postService.like(userId, post.getId()));
 
       //then
       assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
@@ -130,7 +121,7 @@ class PostServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> postService.likePost(userId, post.getId()));
+          -> postService.like(userId, post.getId()));
 
       //then
       assertEquals(ErrorCode.ALREADY_LIKED_POST, exception.getErrorCode());
