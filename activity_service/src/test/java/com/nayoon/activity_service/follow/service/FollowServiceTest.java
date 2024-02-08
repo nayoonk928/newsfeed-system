@@ -8,9 +8,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
+import com.nayoon.activity_service.client.UserClient;
 import com.nayoon.activity_service.common.exception.CustomException;
 import com.nayoon.activity_service.common.exception.ErrorCode;
 import com.nayoon.activity_service.follow.dto.request.FollowRequest;
+import com.nayoon.activity_service.follow.entity.Follow;
 import com.nayoon.activity_service.follow.repository.FollowRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +32,12 @@ class FollowServiceTest {
   @Mock
   private FollowRepository followRepository;
 
+  @Mock
+  private NewsfeedClient newsfeedClient;
+
+  @Mock
+  private UserClient userClient;
+
   @Nested
   @DisplayName("팔로우")
   class follow {
@@ -41,9 +50,13 @@ class FollowServiceTest {
       Long followingId = 2L;
 
       when(followRepository.existsByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(false);
+      when(followRepository.save(any(Follow.class))).thenAnswer(invocation -> {
+        return Follow.builder().followerId(principalId).followingId(followingId).build();
+      });
+      when(userClient.checkUserExists(principalId)).thenReturn(true);
 
       //when
-      followService.follow(principalId, createFollowRequest(principalId, followingId));
+      followService.follow(principalId, new FollowRequest(followingId));
 
       //then
       verify(followRepository, times(1)).save(any());
@@ -58,7 +71,7 @@ class FollowServiceTest {
 
       // when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> followService.follow(principalId, createFollowRequest(principalId, followingId)));
+          -> followService.follow(principalId, new FollowRequest(followingId)));
 
       // then
       assertEquals(ErrorCode.CANNOT_FOLLOW_SELF, exception.getErrorCode());
@@ -72,35 +85,33 @@ class FollowServiceTest {
       Long followingId = 2L;
 
       when(followRepository.existsByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(true);
+      when(userClient.checkUserExists(principalId)).thenReturn(true);
 
       // when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> followService.follow(principalId, createFollowRequest(principalId, followingId)));
+          -> followService.follow(principalId, new FollowRequest(followingId)));
 
       // then
       assertEquals(ErrorCode.ALREADY_FOLLOWING, exception.getErrorCode());
     }
 
     @Test
-    @DisplayName("실패: 요청 권한 없음")
+    @DisplayName("실패: 사용자 없음")
     void unauthorizedAccess() {
       //given
       Long principalId = 1L;
       Long followingId = 2L;
-      Long followerId = 3L;
+
+      when(userClient.checkUserExists(principalId)).thenReturn(false);
 
       // when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> followService.follow(principalId, createFollowRequest(followerId, followingId)));
+          -> followService.follow(principalId, new FollowRequest(followingId)));
 
       // then
-      assertEquals(ErrorCode.UNAUTHORIZED_ACCESS, exception.getErrorCode());
+      assertEquals(ErrorCode.INVALID_REQUEST, exception.getErrorCode());
     }
 
-  }
-
-  private FollowRequest createFollowRequest(Long followerUserId, Long followingUserId) {
-    return new FollowRequest(followerUserId, followingUserId);
   }
 
 }

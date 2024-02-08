@@ -5,11 +5,14 @@ import com.nayoon.newsfeed_service.newsfeed.dto.request.NewsfeedCreateRequest;
 import com.nayoon.newsfeed_service.newsfeed.entity.Newsfeed;
 import com.nayoon.newsfeed_service.newsfeed.repository.NewsfeedRepository;
 import com.nayoon.newsfeed_service.newsfeed.type.ActivityType;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,8 @@ public class NewsfeedService {
    * 뉴스피드 생성
    */
   @Transactional
+  @CircuitBreaker(name = "newsfeedService", fallbackMethod = "fallback")
+  @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
   public void create(NewsfeedCreateRequest request) {
     Newsfeed newsfeed = Newsfeed.builder()
         .actionUserId(request.actionUserId())
@@ -35,6 +40,10 @@ public class NewsfeedService {
         .build();
 
     newsfeedRepository.save(newsfeed);
+  }
+
+  private void fallback(Exception ex) {
+    log.error("Fallback Method is Running: ", ex);
   }
 
   /**

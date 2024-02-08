@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nayoon.activity_service.client.NewsfeedClient;
 import com.nayoon.activity_service.comment.dto.request.CommentCreateRequest;
 import com.nayoon.activity_service.comment.entity.Comment;
 import com.nayoon.activity_service.comment.entity.CommentLike;
@@ -44,23 +45,8 @@ class CommentServiceTest {
   @Mock
   private CommentLikeRepository commentLikeRepository;
 
-//  @Mock
-//  private NewsfeedService newsfeedService;
-//
-//  @Mock
-//  private NewsfeedRepository newsfeedRepository;
-//
-//  private static MockedStatic<NewsfeedCreateRequest> mNewsfeedCreateRequest;
-//
-//  @BeforeAll
-//  static void beforeClass() {
-//    mNewsfeedCreateRequest = mockStatic(NewsfeedCreateRequest.class);
-//  }
-//
-//  @AfterAll
-//  static void afterClass() {
-//    mNewsfeedCreateRequest.close();
-//  }
+  @Mock
+  private NewsfeedClient newsfeedClient;
 
   @Nested
   @DisplayName("댓글 생성")
@@ -82,7 +68,7 @@ class CommentServiceTest {
       });
 
       //when
-      Long commentId = commentService.createComment(userId, request);
+      Long commentId = commentService.create(userId, request);
 
       //then
       assertNotNull(commentId);
@@ -98,13 +84,11 @@ class CommentServiceTest {
       Long postId = 1L;
       CommentCreateRequest request = new CommentCreateRequest(postId, "content");
 
-      Post post = mock(Post.class);
-
       when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
       //when
       CustomException exception = assertThrows(CustomException.class,
-          () -> commentService.createComment(userId, request));
+          () -> commentService.create(userId, request));
 
       //then
       assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
@@ -127,9 +111,12 @@ class CommentServiceTest {
 
       when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
       when(commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), userId)).thenReturn(false);
+      when(commentLikeRepository.save(any(CommentLike.class))).thenAnswer(invocation -> {
+        return CommentLike.builder().id(123L).comment(comment).userId(userId).liked(true).build();
+      });
 
       //when
-      commentService.likeComment(userId, comment.getId());
+      commentService.like(userId, comment.getId());
 
       //then
       verify(commentLikeRepository, times(1)).save(any(CommentLike.class));
@@ -146,7 +133,7 @@ class CommentServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> commentService.likeComment(userId, comment.getId()));
+          -> commentService.like(userId, comment.getId()));
 
       //then
       assertEquals(ErrorCode.COMMENT_NOT_FOUND, exception.getErrorCode());
@@ -164,7 +151,7 @@ class CommentServiceTest {
 
       //when
       CustomException exception = assertThrows(CustomException.class, ()
-          -> commentService.likeComment(userId, comment.getId()));
+          -> commentService.like(userId, comment.getId()));
 
       //then
       assertEquals(ErrorCode.ALREADY_LIKED_COMMENT, exception.getErrorCode());

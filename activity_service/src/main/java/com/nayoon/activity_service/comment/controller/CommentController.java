@@ -29,7 +29,7 @@ public class CommentController {
       @Valid @RequestBody CommentCreateRequest request
   ) {
     Long principalId = Long.valueOf(httpRequest.getHeader("X-USER-ID"));
-    Long commentId = commentService.createComment(principalId, request);
+    Long commentId = commentService.create(principalId, request);
     return ResponseEntity.created(URI.create("api/v1/comments/" + commentId)).build();
   }
 
@@ -42,7 +42,7 @@ public class CommentController {
       @PathVariable("id") Long commentId
   ) {
     Long principalId = Long.valueOf(httpRequest.getHeader("X-USER-ID"));
-    commentService.likeComment(principalId, commentId);
+    commentService.like(principalId, commentId);
     return ResponseEntity.ok().build();
   }
 

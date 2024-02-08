@@ -1,0 +1,12 @@
+config:
+  target: "http://localhost:8082"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: case2
+
+scenarios:
+  - name: "error case2"
+    flow:
+      - get:
+          url: "/errorful/case2"
