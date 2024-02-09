@@ -1,7 +1,7 @@
 FROM openjdk:17
 
 # Set environment variables
-ENV APP_DIR=/opt/app/activity-service/classes
+ENV APP_DIR=/opt/app/ecommerce-service/classes
 
 # Set working directory
 WORKDIR ${APP_DIR}
