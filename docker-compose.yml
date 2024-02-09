@@ -43,37 +43,6 @@ services:
     networks:
       - preorder
 
-  adminer:
-    image: adminer
-    container_name: adminer
-    ports:
-      - "8088:8088"
-
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - preorder
-
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    volumes:
-      - /var/run/docker.sock:/var/run/docker..sock
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "preorder:1:1"
-    depends_on:
-      - zookeeper
-    networks:
-      - preorder
-
-
   user-service:
     image: user-service:1.0
     container_name: user-service
@@ -133,6 +102,27 @@ services:
       - ${REDIS_YML}=${REDIS_HOST}
       - ${POSTGRES_YML}=${POSTGRES_URL}
       - ${FEIGN_ACTIVITY_CLIENT_YML}=${FEIGN_ACTIVITY_CLIENT}
+    depends_on:
+      - eureka
+      - postgres
+      - redis
+    networks:
+      - preorder
+
+  ecommerce-service:
+    image: ecommerce-service:1.0
+    container_name: ecommerce-service
+    build:
+      context: module_ecommerce_service/
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    env_file:
+      - .env
+    environment:
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+      - ${POSTGRES_YML}=${POSTGRES_URL}
     depends_on:
       - eureka
       - postgres
