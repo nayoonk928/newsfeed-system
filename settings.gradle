@@ -1,7 +1,7 @@
 rootProject.name = 'preorder-system'
 
-include 'user_service'
-include 'activity_service'
-include 'newsfeed_service'
-include 'api_gateway_service'
-include 'service_discovery'
+include 'module_user_service'
+include 'module_activity_service'
+include 'module_newsfeed_service'
+include 'module_api_gateway'
+include 'module_eureka'

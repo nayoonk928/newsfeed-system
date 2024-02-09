@@ -1,0 +1,37 @@
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+dependencies {
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks {
+    bootJar {
+        archiveFileName.set("app.jar")
+    }
+}
+
+task copyDeps(type: Copy) {
+    from(sourceSets.main.runtimeClasspath)
+    includeEmptyDirs = false
+    into('/opt/app/eureka/classes/')
+}
+
+task cleanDeps(type: Delete) {
+    delete '/opt/app/eureka/classes/'
+}
+
+// prepareKotlinBuildScriptModel 오류 방지
+tasks.register("prepareKotlinBuildScriptModel") {}
