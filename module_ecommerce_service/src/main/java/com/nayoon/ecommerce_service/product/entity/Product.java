@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +22,9 @@ public class Product {
   @Column(name = "product_id", updatable = false)
   private Long id;
 
+  @Column(name = "user_id", nullable = false) // 상품 등록한 사용자 ID
+  private Long userId;
+
   @Column(name = "name", nullable = false)
   private String name;
 
@@ -32,23 +34,18 @@ public class Product {
   @Column(name = "price", nullable = false)
   private Long price;
 
-  @Column(name = "is_reserved", nullable = false)
-  private Boolean isReserved;
-
-  @Column(name = "reserved_at")
-  private LocalDateTime reservedAt;
-
   @Builder
-  public Product(String name, String content, Long price, Boolean isReserved, LocalDateTime reservedAt) {
+  public Product(Long userId, String name, String content, Long price) {
+    this.userId = userId;
     this.name = name;
     this.content = content;
     this.price = price;
-    this.isReserved = isReserved;
-    this.reservedAt = reservedAt;
   }
 
-  public void update() {
-
+  public void update(String name, String content, Long price) {
+    this.name = name;
+    this.content = content;
+    this.price = price;
   }
 
 }

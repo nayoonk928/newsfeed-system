@@ -10,6 +10,7 @@ public enum ErrorCode {
 
   REQUIRED_RESERVED_AT(HttpStatus.BAD_REQUEST, "예약시간을 입력해주세요."),
   PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
+  PRODUCT_STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 재고를 찾을 수 없습니다."),
 
   // ------ 5xx ------
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 발생했습니다."),

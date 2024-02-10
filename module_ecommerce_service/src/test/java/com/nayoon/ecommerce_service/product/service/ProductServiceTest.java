@@ -1,19 +1,19 @@
 package com.nayoon.ecommerce_service.product.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.nayoon.ecommerce_service.common.exception.CustomException;
-import com.nayoon.ecommerce_service.common.exception.ErrorCode;
 import com.nayoon.ecommerce_service.product.dto.request.ProductCreateRequest;
+import com.nayoon.ecommerce_service.product.dto.request.ProductUpdateRequest;
 import com.nayoon.ecommerce_service.product.entity.Product;
 import com.nayoon.ecommerce_service.product.entity.ProductStock;
 import com.nayoon.ecommerce_service.product.repository.ProductRepository;
 import com.nayoon.ecommerce_service.product.repository.ProductStockRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,57 +45,59 @@ class ProductServiceTest {
       ProductCreateRequest request = mockProductCreateRequest();
       Product product = mockProduct();
 
-      when(productRepository.save(any(Product.class))).thenReturn(product);
+      when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+        return Product.builder().name(request.name()).content(request.content()).price(request.price()).build();
+      });
+      when(productStockRepository.save(any(ProductStock.class))).thenAnswer(invocation -> {
+        return ProductStock.builder().productId(product.getId()).count(request.count()).build();
+      });
 
       //when
-      productService.create(request);
+      Long productId = productService.create(product.getId(), request);
+
+      //then
+      assertEquals(productId, product.getId());
+      verify(productRepository, times(1)).save(any(Product.class));
+      verify(productStockRepository, times(1)).save(any(ProductStock.class));
+    }
+
+  }
+
+  @Nested
+  @DisplayName("상품 수정")
+  class update {
+
+    @Test
+    @DisplayName("성공")
+    void success() {
+      //given
+      Long principalId = 1L;
+      ProductUpdateRequest request = mockProductUpdateRequest();
+      Product product = mockProduct();
+      productRepository.save(product);
+
+      ProductStock productStock = mock(ProductStock.class);
+      productStockRepository.save(productStock);
+
+      when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+      when(productStockRepository.findById(product.getId())).thenReturn(Optional.of(productStock));
+
+      //when
+      productService.update(principalId, product.getId(), request);
 
       //then
       verify(productRepository, times(1)).save(any(Product.class));
       verify(productStockRepository, times(1)).save(any(ProductStock.class));
     }
 
-    @Test
-    @DisplayName("실패: 예약 상품 시간이 없음")
-    void requiredReservedAt() {
-      //given
-      ProductCreateRequest request = mockInvalidProductCreateRequest();
-
-      //when
-      CustomException exception = assertThrows(CustomException.class, ()
-          -> productService.create(request));
-
-      //then
-      assertEquals(ErrorCode.REQUIRED_RESERVED_AT, exception.getErrorCode());
-    }
-
-  }
-
-  private ProductStock mockProductStock(Long productId) {
-    return ProductStock.builder()
-        .productId(productId)
-        .count(100)
-        .build();
   }
 
   private Product mockProduct() {
     return Product.builder()
+        .userId(1L)
         .name("테스트 상품1")
         .content("테스트 상품1 내용")
         .price(10000L)
-        .isReserved(false)
-        .reservedAt(null)
-        .build();
-  }
-
-  private ProductCreateRequest mockInvalidProductCreateRequest() {
-    return ProductCreateRequest.builder()
-        .name("테스트 상품1")
-        .content("테스트 상품1 내용")
-        .price(10000L)
-        .count(100)
-        .isReserved(true)
-        .reservedAt(null)
         .build();
   }
 
@@ -105,8 +107,12 @@ class ProductServiceTest {
         .content("테스트 상품1 내용")
         .price(10000L)
         .count(100)
-        .isReserved(false)
-        .reservedAt(null)
+        .build();
+  }
+
+  private ProductUpdateRequest mockProductUpdateRequest() {
+    return ProductUpdateRequest.builder()
+        .content("테스트 상품1 새 내용")
         .build();
   }
 
