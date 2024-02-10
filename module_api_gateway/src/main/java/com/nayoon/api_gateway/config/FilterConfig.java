@@ -37,6 +37,11 @@ public class FilterConfig {
                 .rewritePath("/activity-service/(?<segment>.*)", "/api/v1/${segment}")
                 .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
             .uri("lb://ACTIVITY-SERVICE"))
+        .route(r -> r.path("/ecommerce-service/**")
+            .filters(f -> f
+                .rewritePath("/ecommerce-service/(?<segment>.*)", "/api/v1/${segment}")
+                .filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
+            .uri("lb://ECOMMERCE-SERVICE"))
         .build();
   }
 

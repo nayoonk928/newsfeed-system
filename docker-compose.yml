@@ -19,22 +19,6 @@ services:
     networks:
       - preorder
 
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    env_file:
-      - .env
-    volumes:
-      - ./db/mongodb/data:/var/lib/mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGO_DB}
-    networks:
-      - preorder
-
   redis:
     image: redis
     container_name: redis
@@ -46,6 +30,7 @@ services:
   user-service:
     image: user-service:1.0
     container_name: user-service
+    restart: always
     build:
       context: module_user_service/
       dockerfile: Dockerfile
@@ -67,6 +52,7 @@ services:
   activity-service:
     image: activity-service:1.0
     container_name: activity-service
+    restart: always
     build:
       context: module_activity_service/
       dockerfile: Dockerfile
@@ -90,6 +76,7 @@ services:
   newsfeed-service:
     image: newsfeed-service:1.0
     container_name: newsfeed-service
+    restart: always
     build:
       context: module_newsfeed_service/
       dockerfile: Dockerfile
@@ -112,6 +99,7 @@ services:
   ecommerce-service:
     image: ecommerce-service:1.0
     container_name: ecommerce-service
+    restart: always
     build:
       context: module_ecommerce_service/
       dockerfile: Dockerfile
@@ -133,6 +121,7 @@ services:
   eureka:
     image: eureka:1.0
     container_name: eureka
+    restart: always
     build:
       context: module_eureka/
       dockerfile: Dockerfile
@@ -147,6 +136,7 @@ services:
     build:
       context: module_api_gateway/
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "8083:8083"
     env_file:
