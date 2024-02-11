@@ -1,0 +1,59 @@
+repositories {
+    maven { url 'https://repo.spring.io/snapshot' }
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // API Gateway
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+    // Eureka
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks {
+    bootJar {
+        archiveFileName.set("app.jar")
+    }
+}
+
+task copyDeps(type: Copy) {
+    from(sourceSets.main.runtimeClasspath)
+    includeEmptyDirs = false
+    into('/opt/app/api-gateway/classes/')
+}
+
+task cleanDeps(type: Delete) {
+    delete '/opt/app/api-gateway/classes/'
+}
+
+// prepareKotlinBuildScriptModel 오류 방지
+tasks.register("prepareKotlinBuildScriptModel") {}

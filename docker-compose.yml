@@ -8,29 +8,14 @@ services:
       - .env
     volumes:
       - ./db/postgres/data:/var/lib/postgres
-#      - ./db/postgres/init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    expose:
+      - 5432
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_MULTIPLE_DATABASES: preorder_db
-    networks:
-      - preorder
-
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    env_file:
-      - .env
-    volumes:
-      - ./db/mongodb/data:/var/lib/mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=preorder_db
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_DB}
     networks:
       - preorder
 
@@ -42,36 +27,125 @@ services:
     networks:
       - preorder
 
-  adminer:
-    image: adminer
-    container_name: adminer
+  user-service:
+    image: user-service:1.0
+    container_name: user-service
+    restart: always
+    build:
+      context: module_user_service/
+      dockerfile: Dockerfile
     ports:
-      - "8088:8088"
-
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - preorder
-
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    volumes:
-      - /var/run/docker.sock:/var/run/docker..sock
-    ports:
-      - "9092:9092"
+      - "8080:8080"
+    env_file:
+      - .env
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "preorder:1:1"
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+      - ${POSTGRES_YML}=${POSTGRES_URL}
     depends_on:
-      - zookeeper
+      - eureka
+      - postgres
+      - redis
     networks:
       - preorder
 
+  activity-service:
+    image: activity-service:1.0
+    container_name: activity-service
+    restart: always
+    build:
+      context: module_activity_service/
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    environment:
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+      - ${POSTGRES_YML}=${POSTGRES_URL}
+      - ${FEIGN_NEWSFEED_CLIENT_YML}=${FEIGN_NEWSFEED_CLIENT}
+      - ${FEIGN_USER_CLIENT_YML}=${FEIGN_USER_CLIENT}
+    depends_on:
+      - eureka
+      - postgres
+      - redis
+    networks:
+      - preorder
+
+  newsfeed-service:
+    image: newsfeed-service:1.0
+    container_name: newsfeed-service
+    restart: always
+    build:
+      context: module_newsfeed_service/
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+      - ${POSTGRES_YML}=${POSTGRES_URL}
+      - ${FEIGN_ACTIVITY_CLIENT_YML}=${FEIGN_ACTIVITY_CLIENT}
+    depends_on:
+      - eureka
+      - postgres
+      - redis
+    networks:
+      - preorder
+
+  ecommerce-service:
+    image: ecommerce-service:1.0
+    container_name: ecommerce-service
+    restart: always
+    build:
+      context: module_ecommerce_service/
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    env_file:
+      - .env
+    environment:
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+      - ${POSTGRES_YML}=${POSTGRES_URL}
+    depends_on:
+      - eureka
+      - postgres
+      - redis
+    networks:
+      - preorder
+
+  eureka:
+    image: eureka:1.0
+    container_name: eureka
+    restart: always
+    build:
+      context: module_eureka/
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - preorder
+
+  api-gateway:
+    image: api-gateway:1.0
+    container_name: api-gateway
+    build:
+      context: module_api_gateway/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    environment:
+      - ${EUREKA_YML}=${EUREKA_URL}
+      - ${REDIS_YML}=${REDIS_HOST}
+    networks:
+      - preorder
 
 networks:
   preorder:
