@@ -49,7 +49,7 @@ class ProductServiceTest {
         return Product.builder().name(request.name()).content(request.content()).price(request.price()).build();
       });
       when(productStockRepository.save(any(ProductStock.class))).thenAnswer(invocation -> {
-        return ProductStock.builder().productId(product.getId()).count(request.count()).build();
+        return ProductStock.builder().productId(product.getId()).stock(request.stock()).build();
       });
 
       //when
@@ -106,7 +106,7 @@ class ProductServiceTest {
         .name("테스트 상품1")
         .content("테스트 상품1 내용")
         .price(10000L)
-        .count(100)
+        .stock(100)
         .build();
   }
 

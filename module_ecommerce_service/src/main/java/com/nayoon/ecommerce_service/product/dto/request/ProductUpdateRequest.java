@@ -7,7 +7,7 @@ public record ProductUpdateRequest(
     String name,
     String content,
     Long price,
-    Integer count
+    Integer stock
 ) {
 
 }

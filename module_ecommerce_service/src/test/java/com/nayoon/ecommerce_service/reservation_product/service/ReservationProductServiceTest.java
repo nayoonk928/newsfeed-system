@@ -50,7 +50,7 @@ class ReservationProductServiceTest {
         return product;
       });
       when(reservationProductStockRepository.save(any(ReservationProductStock.class))).thenAnswer(invocation -> {
-        return ReservationProductStock.builder().productId(product.getId()).count(request.count()).build();
+        return ReservationProductStock.builder().productId(product.getId()).stock(request.stock()).build();
       });
 
       //when
@@ -108,7 +108,7 @@ class ReservationProductServiceTest {
         .name("테스트 상품1")
         .content("테스트 상품1 내용")
         .price(10000L)
-        .count(100)
+        .stock(100)
         .reservedAt(LocalDateTime.now())
         .build();
   }

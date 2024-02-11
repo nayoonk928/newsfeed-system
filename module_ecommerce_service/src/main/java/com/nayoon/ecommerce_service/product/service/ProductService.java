@@ -4,11 +4,15 @@ import com.nayoon.ecommerce_service.common.exception.CustomException;
 import com.nayoon.ecommerce_service.common.exception.ErrorCode;
 import com.nayoon.ecommerce_service.product.dto.request.ProductCreateRequest;
 import com.nayoon.ecommerce_service.product.dto.request.ProductUpdateRequest;
+import com.nayoon.ecommerce_service.product.dto.response.ProductResponse;
+import com.nayoon.ecommerce_service.product.dto.response.ProductStockResponse;
 import com.nayoon.ecommerce_service.product.entity.Product;
 import com.nayoon.ecommerce_service.product.entity.ProductStock;
 import com.nayoon.ecommerce_service.product.repository.ProductRepository;
 import com.nayoon.ecommerce_service.product.repository.ProductStockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +38,7 @@ public class ProductService {
     Product saved = productRepository.save(product);
     ProductStock productStock = ProductStock.builder()
         .productId(saved.getId())
-        .count(request.count())
+        .stock(request.stock())
         .build();
 
     productStockRepository.save(productStock);
@@ -56,13 +60,48 @@ public class ProductService {
     checkProductOwner(principalId, product);
 
     product.update(request.name(), request.content(), request.price());
-    productStock.update(request.count());
+    productStock.update(request.stock());
   }
 
   private void checkProductOwner(Long principalId, Product product) {
     if (!principalId.equals(product.getUserId())) {
       throw new CustomException(ErrorCode.INVALID_REQUEST);
     }
+  }
+
+  /**
+   * 상품 상세정보 조회
+   */
+  @Transactional
+  public ProductResponse getProductInfoById(Long productId) {
+    Product product = productRepository.findById(productId)
+        .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+    return ProductResponse.builder()
+        .name(product.getName())
+        .content(product.getContent())
+        .price(product.getPrice())
+        .build();
+  }
+
+  /**
+   * 전체 상품 조회
+   */
+  public Page<Product> getAllProducts(Pageable pageable) {
+    return productRepository.filterAllProducts(pageable);
+  }
+
+  /**
+   * 상품 재고 조회
+   */
+  public ProductStockResponse getProductStockById(Long productId) {
+    ProductStock productStock = productStockRepository.findById(productId)
+        .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND));
+
+    return ProductStockResponse.builder()
+        .productId(productStock.getProductId())
+        .stock(productStock.getStock())
+        .build();
   }
 
 }

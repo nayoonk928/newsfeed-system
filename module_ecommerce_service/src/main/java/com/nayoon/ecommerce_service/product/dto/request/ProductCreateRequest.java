@@ -13,7 +13,7 @@ public record ProductCreateRequest(
     @NotNull
     Long price,
     @NotNull
-    Integer count
+    Integer stock
 ) {
 
 }

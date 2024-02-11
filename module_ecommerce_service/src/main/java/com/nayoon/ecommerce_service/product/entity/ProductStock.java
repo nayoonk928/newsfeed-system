@@ -19,17 +19,17 @@ public class ProductStock {
   @Column(name = "product_id", updatable = false)
   private Long productId;
 
-  @Column(name = "count", nullable = false)
-  private Integer count;
+  @Column(name = "stock", nullable = false)
+  private Integer stock;
 
   @Builder
-  public ProductStock(Long productId, Integer count) {
+  public ProductStock(Long productId, Integer stock) {
     this.productId = productId;
-    this.count = count;
+    this.stock = stock;
   }
 
-  public void update(Integer count) {
-    this.count = count;
+  public void update(Integer stock) {
+    this.stock = stock;
   }
 
 }

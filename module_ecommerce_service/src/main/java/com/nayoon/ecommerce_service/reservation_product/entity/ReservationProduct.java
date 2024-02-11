@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "product")
+@Table(name = "reservation_product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationProduct extends BaseEntity {
 

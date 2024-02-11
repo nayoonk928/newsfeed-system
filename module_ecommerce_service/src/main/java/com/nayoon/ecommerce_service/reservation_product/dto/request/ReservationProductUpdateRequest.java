@@ -8,7 +8,7 @@ public record ReservationProductUpdateRequest(
     String name,
     String content,
     Long price,
-    Integer count,
+    Integer stock,
     LocalDateTime reservedAt
 ) {
 

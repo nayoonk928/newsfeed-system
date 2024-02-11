@@ -14,7 +14,7 @@ public record ReservationProductCreateRequest(
     @NotNull
     Long price,
     @NotNull
-    Integer count,
+    Integer stock,
     @NotNull
     LocalDateTime reservedAt
 ) {

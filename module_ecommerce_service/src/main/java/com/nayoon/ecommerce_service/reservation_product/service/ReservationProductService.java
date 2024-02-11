@@ -35,7 +35,7 @@ public class ReservationProductService {
     ReservationProduct saved = reservationProductRepository.save(reservationProduct);
     ReservationProductStock reservationProductStock = ReservationProductStock.builder()
         .productId(saved.getId())
-        .count(request.count())
+        .stock(request.stock())
         .build();
 
     reservationProductStockRepository.save(reservationProductStock);
@@ -57,7 +57,7 @@ public class ReservationProductService {
         .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND));
 
     reservationProduct.update(request.name(), request.content(), request.price(), request.reservedAt());
-    reservationProductStock.update(request.count());
+    reservationProductStock.update(request.stock());
   }
 
   private void checkProductOwner(Long principalId, ReservationProduct reservationProduct) {

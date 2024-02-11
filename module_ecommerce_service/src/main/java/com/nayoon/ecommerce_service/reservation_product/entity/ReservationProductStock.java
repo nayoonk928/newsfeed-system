@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "product_stock")
+@Table(name = "reservation_product_stock")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationProductStock {
 
@@ -19,17 +19,17 @@ public class ReservationProductStock {
   @Column(name = "product_id", updatable = false)
   private Long productId;
 
-  @Column(name = "count", nullable = false)
-  private Integer count;
+  @Column(name = "stock", nullable = false)
+  private Integer stock;
 
   @Builder
-  public ReservationProductStock(Long productId, Integer count) {
+  public ReservationProductStock(Long productId, Integer stock) {
     this.productId = productId;
-    this.count = count;
+    this.stock = stock;
   }
 
-  public void update(Integer count) {
-    this.count = count;
+  public void update(Integer stock) {
+    this.stock = stock;
   }
 
 }
