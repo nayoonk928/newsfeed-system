@@ -1,4 +1,4 @@
-package com.nayoon.ecommerce_service.product.entity;
+package com.nayoon.ecommerce_service.reservation_product.entity;
 
 import com.nayoon.ecommerce_service.common.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product extends BaseEntity {
+public class ReservationProduct extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,22 +36,28 @@ public class Product extends BaseEntity {
   @Column(name = "price", nullable = false)
   private Long price;
 
+  @Column(name = "reserved_at", nullable = false)
+  private LocalDateTime reservedAt;
+
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
   @Builder
-  public Product(Long userId, String name, String content, Long price, LocalDateTime deletedAt) {
+  public ReservationProduct(Long userId, String name, String content, Long price,
+      LocalDateTime reservedAt, LocalDateTime deletedAt) {
     this.userId = userId;
     this.name = name;
     this.content = content;
     this.price = price;
+    this.reservedAt = reservedAt;
     this.deletedAt = deletedAt;
   }
 
-  public void update(String name, String content, Long price) {
+  public void update(String name, String content, Long price, LocalDateTime reservedAt) {
     this.name = name;
     this.content = content;
     this.price = price;
+    this.reservedAt = reservedAt;
   }
 
 }
