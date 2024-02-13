@@ -96,28 +96,6 @@ services:
     networks:
       - preorder
 
-  ecommerce-service:
-    image: ecommerce-service:1.0
-    container_name: ecommerce-service
-    restart: always
-    build:
-      context: module_ecommerce_service/
-      dockerfile: Dockerfile
-    ports:
-      - "8084:8084"
-    env_file:
-      - .env
-    environment:
-      - ${EUREKA_YML}=${EUREKA_URL}
-      - ${REDIS_YML}=${REDIS_HOST}
-      - ${POSTGRES_YML}=${POSTGRES_URL}
-    depends_on:
-      - eureka
-      - postgres
-      - redis
-    networks:
-      - preorder
-
   eureka:
     image: eureka:1.0
     container_name: eureka
